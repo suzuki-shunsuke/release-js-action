@@ -113,6 +113,6 @@ runs:
 
     - run: aqua -c "$GITHUB_ACTION_PATH/aqua.yaml" exec -- github-comment post -pr "$PR_NUMBER" -k create-pr-branch -var "repo:${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}" -var "PRNumber:$PR_NUMBER"
       shell: bash
-      if: startsWith(inputs.version, "pr/") && inputs.is_comment
+      if: startsWith(inputs.version, 'pr/') && inputs.is_comment
       env:
         GITHUB_TOKEN: ${{github.token}}
