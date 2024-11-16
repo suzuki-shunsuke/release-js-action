@@ -15,11 +15,14 @@ inputs:
 runs:
   using: composite
   steps:
+    # Output a link to a pull request to a Job Summary
     - run: echo "[Pull Request](${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/pull/$PR_NUMBER)" >> "$GITHUB_STEP_SUMMARY"
       shell: bash
       if: inputs.pr != ''
       env:
         PR_NUMBER: ${{inputs.pr}}
+
+    # Install aqua for github-commment
     - run: |
         if command -v aqua >/dev/null; then
           echo "installed=true" >> "$GITHUB_OUTPUT"
@@ -32,11 +35,13 @@ runs:
       if: steps.aqua.outputs.installed != 'true'
       with:
         aqua_version: v2.37.2
+        enable_aqua_install: "false"
+
+    # Set up git config to create and push a commit
     - run: gh auth setup-git
       shell: bash
       env:
         GITHUB_TOKEN: ${{github.token}}
-
     # https://github.community/t/github-actions-bot-email-address/17204/5
     - run: git config user.name "github-actions[bot]"
       shell: bash
@@ -60,8 +65,11 @@ runs:
       shell: bash
       env:
         BRANCH: ${{steps.branch.outputs.value}}
+
+    # git add dist
     - run: find . -name dist -type d | grep -v node_modules | grep -v .git | xargs git add -f
       shell: bash
+    # Fix action versions
     - run: |
         if git ls-files | grep -E "/action\.yaml$" | grep -v -E "^\.github" >/dev/null; then
           git ls-files | grep -E "/action\.yaml$" | grep -v -E "^\.github" |
@@ -70,6 +78,7 @@ runs:
       shell: bash
       env:
         VERSION: ${{inputs.version}}
+    # Create a commit
     - run: |
         git commit -a -m "chore: release ${VERSION}
         base revision: $BASE_REVISION"
@@ -78,6 +87,7 @@ runs:
         VERSION: ${{inputs.version}}
         BASE_REVISION: ${{steps.base_revision.outputs.value}}
 
+    # Push a branch
     - run: git push origin "$BRANCH" --force
       if: ${{!startsWith(inputs.version, 'v')}}
       shell: bash
@@ -85,6 +95,7 @@ runs:
         GITHUB_TOKEN: ${{github.token}}
         BRANCH: ${{steps.branch.outputs.value}}
 
+    # Create and push a tag
     - run: git tag "$TAG"
       shell: bash
       if: startsWith(inputs.version, 'v')
@@ -95,6 +106,7 @@ runs:
       if: startsWith(inputs.version, 'v')
       env:
         TAG: ${{inputs.version}}
+    # Create a release
     - run: gh release create "$TAG" -p --title "$TAG" -n "$NOTE"
       shell: bash
       if: startsWith(inputs.version, 'v')
@@ -103,6 +115,7 @@ runs:
         GITHUB_TOKEN: ${{github.token}}
         TAG: ${{inputs.version}}
 
+    # Post a comment to a pull request when releasing a pre-release
     - run: |
         aqua -c "$GITHUB_ACTION_PATH/aqua.yaml" exec -- \
           github-comment post \
@@ -116,6 +129,7 @@ runs:
         PR: ${{inputs.pr}}
         TAG: ${{inputs.version}}
 
+    # Post a comment to a pull request when creating or updating pr/<pr number>
     - run: |
         PR="${VERSION#pr/}"
         aqua -c "$GITHUB_ACTION_PATH/aqua.yaml" exec -- \
