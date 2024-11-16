@@ -1,0 +1,19 @@
+---
+post:
+  create-pr-branch:
+    template: |
+      # :rocket: Pull Request Branch was created or updated
+
+      {{template "link" .}}
+
+      The pull request branch [pr/{{.Vars.pr}}]({{.Vars.repo}}/tree/pr/{{.Vars.pr}}) was created or updated.
+
+      You can try this pull request in your workflows by changing version to `pr/{{.Vars.pr}}`.
+
+  pre-release:
+    template: |
+      # :rocket: Pre-release {{.Vars.tag}} was created
+
+      {{template "link" .}} | [Release]({{.Vars.repo}}/releases/tag/{{.Vars.tag}})
+
+      You can try the pre-release version in your workflows by changing version to `{{.Vars.tag}}`.
