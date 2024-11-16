@@ -60,14 +60,6 @@ runs:
       shell: bash
       env:
         BRANCH: ${{steps.branch.outputs.value}}
-    - run: |
-        while read -r line; do
-          pushd "$(dirname "$line")" > /dev/null
-          npm ci
-          npm run build
-          popd
-        done < <(git ls-files | grep package.json)
-      shell: bash
     - run: find . -name dist -type d | grep -v node_modules | grep -v .git | xargs git add -f
       shell: bash
     - run: |
