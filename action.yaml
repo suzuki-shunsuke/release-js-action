@@ -115,6 +115,7 @@ runs:
         aqua -c "$GITHUB_ACTION_PATH/aqua.yaml" exec -- \
           github-comment post \
             -config "$GITHUB_ACTION_PATH/github-comment.yaml" \
+            -var "repo:${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}" \
             -pr "$PR" -k pre-release -var "tag:$TAG"
       shell: bash
       if: inputs.pr != '' && startsWith(inputs.version, 'v')
