@@ -2,6 +2,8 @@
 
 GitHub Action to release JavaScript Actions.
 
+[action.yaml](action.yaml)
+
 This action create a commit with `dist` directories and pushes a branch or tag to release a new version.
 It supports three kinds of releases:
 
@@ -54,7 +56,7 @@ e.g.
 - [`pr/<pull request number>`](https://github.com/suzuki-shunsuke/lock-action/blob/main/.github/workflows/wc-create-pr-branch.yaml)
 
 <details>
-<summary>Example Workflow</summary>
+<summary>Example Workflow (`pr/<pull request number>`)</summary>
 
 ```yaml
 ---
@@ -100,10 +102,10 @@ jobs:
 - [latest](https://github.com/suzuki-shunsuke/lock-action/blob/main/.github/workflows/main.yaml)
 
 <details>
-<summary>Example Workflow</summary>
+<summary>Example Workflow (latest)</summary>
 
 ```yaml
-name: pull request
+name: Update the latest branch
 on:
   push:
     branches:
@@ -128,7 +130,7 @@ jobs:
 - [Release](https://github.com/suzuki-shunsuke/lock-action/blob/main/.github/workflows/release.yaml)
 
 <details>
-<summary>Example Workflow</summary>
+<summary>Example Workflow (Release)</summary>
 
 ```yaml
 ---
