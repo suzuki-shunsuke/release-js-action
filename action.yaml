@@ -121,6 +121,7 @@ runs:
       env:
         GITHUB_TOKEN: ${{github.token}}
         PR: ${{inputs.pr}}
+        TAG: ${{inputs.version}}
 
     - run: |
         PR="${VERSION#pr/}"
