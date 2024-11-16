@@ -6,9 +6,9 @@ post:
 
       {{template "link" .}}
 
-      The pull request branch [pr/{{.PRNumber}}]({{.Var.repo}}/tree/pr/{{.PRNumber}}) was created or updated.
+      The pull request branch [pr/{{.Vars.pr}}]({{.Var.repo}}/tree/pr/{{.Vars.pr}}) was created or updated.
 
-      You can try this pull request in your workflows by changing version to `pr/{{.PRNumber}}`.
+      You can try this pull request in your workflows by changing version to `pr/{{.Vars.pr}}`.
 
   pre-release:
     template: |
