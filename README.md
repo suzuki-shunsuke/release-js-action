@@ -56,7 +56,7 @@ e.g.
 - [`pr/<pull request number>`](https://github.com/suzuki-shunsuke/lock-action/blob/main/.github/workflows/wc-create-pr-branch.yaml)
 
 <details>
-<summary>Example Workflow (`pr/<pull request number>`)</summary>
+<summary>Example Workflow (`Pull Request`)</summary>
 
 ```yaml
 ---
