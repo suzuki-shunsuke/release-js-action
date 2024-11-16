@@ -107,7 +107,7 @@ runs:
       shell: bash
       if: startsWith(inputs.version, 'v')
       env:
-        NOTE: "[Issues](${{github.server_url}}/${{github.repository}}/issues?q=is%3Aissue+is%3Aclosed+milestone%3A${{env.TAG}}) | [Pull Requests](${{github.server_url}}/${{github.repository}}/pulls?q=is%3Apr+is%3Aclosed+milestone%3A${{env.TAG}}) | ${{github.server_url}}/${{github.repository}}/compare/${{env.TAG}}...${{env.TAG}} | [Base revision](${{github.server_url}}/${{github.repository}}/tree/${{steps.base_revision.outputs.value}})"
+        NOTE: "[Issues](${{github.server_url}}/${{github.repository}}/issues?q=is%3Aissue+is%3Aclosed+milestone%3A${{inputs.version}}) | [Pull Requests](${{github.server_url}}/${{github.repository}}/pulls?q=is%3Apr+is%3Aclosed+milestone%3A${{inputs.version}}) | ${{github.server_url}}/${{github.repository}}/compare/${{inputs.version}}...${{inputs.version}} | [Base revision](${{github.server_url}}/${{github.repository}}/tree/${{steps.base_revision.outputs.value}})"
         GITHUB_TOKEN: ${{github.token}}
         TAG: ${{inputs.version}}
 
