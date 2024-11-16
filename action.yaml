@@ -1,15 +1,15 @@
-name: Build JavaScript actions
-description: Build JavaScript actions
+name: Release JavaScript actions
+description: Release JavaScript actions
 inputs:
   version:
     # "pr/<pr number>", "latest" or "<tag>"
-    description: branch
+    description: A released version. One of `pr/<pr number>`, `latest`, or tag vX.Y.Z. 
     required: true
   pr:
-    description: pull request number
+    description: A pull request number
     required: false
   is_comment:
-    description: If the comment is posted
+    description: Whether a comment is posted to a pull request
     required: false
     default: "false"
 runs:
