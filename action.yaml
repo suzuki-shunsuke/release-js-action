@@ -15,6 +15,17 @@ inputs:
 runs:
   using: composite
   steps:
+    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+    - run: echo "[Pull Request](${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/pull/$PR_NUMBER)" >> "$GITHUB_STEP_SUMMARY"
+      shell: bash
+      if: inputs.pr != ''
+      env:
+        PR_NUMBER: ${{inputs.pr}}
+    - run: gh pr checkout "$PR"
+      shell: bash
+      if: inputs.pr != ''
+      env:
+        GITHUB_TOKEN: ${{github.token}}
     - run: |
         if command -v aqua >/dev/null; then
           echo "installed=true" >> "$GITHUB_OUTPUT"
