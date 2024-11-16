@@ -1,0 +1,107 @@
+name: Build JavaScript actions
+description: Build JavaScript actions
+inputs:
+  version:
+    # "pr/<pr number>", "latest" or "<tag>"
+    description: branch
+    required: true
+  pr:
+    description: pull request number
+    required: false
+  is_comment:
+    description: If the comment is posted
+    required: false
+    default: "false"
+runs:
+  using: composite
+  steps:
+    - run: |
+        if command -v aqua >/dev/null; then
+          echo "installed=true" >> "$GITHUB_OUTPUT"
+          exit 0
+        fi
+        echo "installed=false" >> "$GITHUB_OUTPUT"
+      shell: bash
+      id: aqua
+    - uses: aquaproj/aqua-installer@v3.0.1
+      if: steps.aqua.outputs.installed != 'true'
+      with:
+        aqua_version: v2.37.2
+    - run: gh auth setup-git
+      shell: bash
+      env:
+        GITHUB_TOKEN: ${{github.token}}
+
+    # https://github.community/t/github-actions-bot-email-address/17204/5
+    - run: git config user.name "github-actions[bot]"
+      shell: bash
+    - run: git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+      shell: bash
+
+    - run: echo "BASE_REVISION=$(git rev-parse HEAD)" >> "$GITHUB_ENV"
+      shell: bash
+    - run: |
+        if [ "$VERSION" = latest ] || [[ "$VERSION" =~ ^pr/ ]]; then
+          echo "value=$VERSION" >> "$GITHUB_OUTPUT"
+          exit 0
+        fi
+        echo "value=release-$VERSION" >> "$GITHUB_OUTPUT"
+      id: branch
+      shell: bash
+      env:
+        VERSION: ${{inputs.version}}
+    - run: git checkout -b "$BRANCH"
+      shell: bash
+      env:
+        BRANCH: ${{steps.branch.outputs.value}}
+    - run: find . -name dist -type d | grep -v node_modules | grep -v .git | xargs git add -f
+      shell: bash
+    - run: |
+        git ls-files | grep -E "/action\.yaml$" | grep -v -E "^\.github/actions" |
+          xargs -n 1 sed -i "s|- uses: suzuki-shunsuke/tfaction/\(.*\)@main|- uses: suzuki-shunsuke/tfaction/\1@${VERSION}|"
+      shell: bash
+      env:
+        VERSION: ${{inputs.version}}
+    - run: |
+        git commit -a -m "chore: release ${VERSION}
+        base revision: $BASE_REVISION"
+      shell: bash
+      env:
+        VERSION: ${{inputs.version}}
+
+    - run: git push origin "$BRANCH" --force
+      if: ${{!startsWith(inputs.version, 'v')}}
+      shell: bash
+      env:
+        GITHUB_TOKEN: ${{github.token}}
+        BRANCH: ${{steps.branch.outputs.value}}
+
+    - run: git tag "$TAG"
+      shell: bash
+      if: startsWith(inputs.version, 'v')
+      env:
+        TAG: ${{inputs.version}}
+    - run: git push origin "$TAG"
+      shell: bash
+      if: startsWith(inputs.version, 'v')
+      env:
+        TAG: ${{inputs.version}}
+    - run: gh release create "$TAG" -p --title "$TAG" -n "$NOTE"
+      shell: bash
+      if: startsWith(inputs.version, 'v')
+      env:
+        NOTE: "[Issues](${{github.server_url}}/${{github.repository}}/issues?q=is%3Aissue+is%3Aclosed+milestone%3A${{env.TAG}}) | [Pull Requests](${{github.server_url}}/${{github.repository}}/pulls?q=is%3Apr+is%3Aclosed+milestone%3A${{env.TAG}}) | ${{github.server_url}}/${{github.repository}}/compare/${{env.TAG}}...${{env.TAG}} | [Base revision](${{github.server_url}}/${{github.repository}}/tree/${{env.BASE_REVISION}})"
+        GITHUB_TOKEN: ${{github.token}}
+        TAG: ${{inputs.version}}
+
+    - run: aqua -c "$GITHUB_ACTION_PATH/aqua.yaml" exec -- github-comment post -pr "$PR" -k pre-release -var "tag:$TAG"
+      shell: bash
+      if: inputs.pr != '' && startsWith(inputs.version, 'v')
+      env:
+        GITHUB_TOKEN: ${{github.token}}
+
+    - run: aqua -c "$GITHUB_ACTION_PATH/aqua.yaml" exec -- github-comment post -pr "$PR_NUMBER" -k create-pr-branch
+      shell: bash
+      if: startsWith(inputs.version, "pr/") && inputs.is_comment
+      env:
+        GITHUB_TOKEN: ${{github.token}}
