@@ -39,6 +39,7 @@ Instead, we specify the following versions.
 
 ## How To Use
 
+1. If you have already added `dist` to the default or feature branches, you need to remove them
 1. Add `dist` to `.gitignore`
 1. Add GitHub Actions workflows using this action
 
