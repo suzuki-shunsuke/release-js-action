@@ -71,8 +71,10 @@ runs:
     - run: find . -name dist -type d | grep -v node_modules | grep -v .git | xargs git add -f
       shell: bash
     - run: |
-        git ls-files | grep -E "/action\.yaml$" | grep -v -E "^\.github/actions" |
-          xargs --no-run-if-empty -n 1 sed -i "s|- uses: ${GITHUB_REPOSITORY}/\(.*\)@main|- uses: ${GITHUB_REPOSITORY}/\1@${VERSION}|"
+        if git ls-files | grep -E "/action\.yaml$" | grep -v -E "^\.github" >/dev/null; then
+          git ls-files | grep -E "/action\.yaml$" | grep -v -E "^\.github" |
+            xargs -n 1 sed -i "s|- uses: ${GITHUB_REPOSITORY}/\(.*\)@main|- uses: ${GITHUB_REPOSITORY}/\1@${VERSION}|"
+        fi
       shell: bash
       env:
         VERSION: ${{inputs.version}}
