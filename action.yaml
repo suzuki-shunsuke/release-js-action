@@ -72,7 +72,7 @@ runs:
       shell: bash
     - run: |
         git ls-files | grep -E "/action\.yaml$" | grep -v -E "^\.github/actions" |
-          xargs -n 1 sed -i "s|- uses: suzuki-shunsuke/tfaction/\(.*\)@main|- uses: suzuki-shunsuke/tfaction/\1@${VERSION}|"
+          xargs --no-run-if-empty -n 1 sed -i "s|- uses: ${GITHUB_REPOSITORY}/\(.*\)@main|- uses: ${GITHUB_REPOSITORY}/\1@${VERSION}|"
       shell: bash
       env:
         VERSION: ${{inputs.version}}
