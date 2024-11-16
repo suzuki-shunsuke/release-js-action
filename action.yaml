@@ -111,7 +111,11 @@ runs:
         GITHUB_TOKEN: ${{github.token}}
         TAG: ${{inputs.version}}
 
-    - run: aqua -c "$GITHUB_ACTION_PATH/aqua.yaml" exec -- github-comment post -pr "$PR" -k pre-release -var "tag:$TAG"
+    - run: |
+        aqua -c "$GITHUB_ACTION_PATH/aqua.yaml" exec -- \
+          github-comment post \
+            -config "$GITHUB_ACTION_PATH/github-comment.yaml" \
+            -pr "$PR" -k pre-release -var "tag:$TAG"
       shell: bash
       if: inputs.pr != '' && startsWith(inputs.version, 'v')
       env:
@@ -120,7 +124,12 @@ runs:
 
     - run: |
         PR="${VERSION#pr/}"
-        aqua -c "$GITHUB_ACTION_PATH/aqua.yaml" exec -- github-comment post -pr "$PR" -k create-pr-branch -var "repo:${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}" -var "pr:$PR"
+        aqua -c "$GITHUB_ACTION_PATH/aqua.yaml" exec -- \
+          github-comment post \
+            -config "$GITHUB_ACTION_PATH/github-comment.yaml" \
+            -pr "$PR" -k create-pr-branch \
+            -var "repo:${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}" \
+            -var "pr:$PR"
       shell: bash
       if: startsWith(inputs.version, 'pr/') && inputs.is_comment == 'true'
       env:
