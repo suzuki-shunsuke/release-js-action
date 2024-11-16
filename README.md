@@ -22,7 +22,7 @@ But adding compiled files has some problems:
 - Maybe the build result is different by environment
   - Maybe people build TypeScript using different Node.js version
 - Huge changes of compiled files makes hard to review changes
-  - Sometimes the amount of changes is over 10,000
+  - Sometimes the amount of changes is over 10,000 lines
   - Even if we hide compiled files using .gitattribute, huge changes are troublesome
 - Attackers can add malicious code to compiled files
   - If compiled files are huge, it's hard to find malicious code by code review
@@ -36,6 +36,31 @@ Instead, we specify the following versions.
 1. `pr/<pull request number>`: branches where pull request branches are built
 1. `latest`: A branch where the default branch is built
 1. GitHub Releases
+
+For example, [lock-action](https://github.com/suzuki-shunsuke/lock-action) uses this action.
+The following versions don't work:
+
+```yaml
+- uses: suzuki-shunsuke/lock-action@main
+```
+
+```yaml
+- uses: suzuki-shunsuke/lock-action@feature-branch-1
+```
+
+Instead, the following versions are available:
+
+```yaml
+- uses: suzuki-shunsuke/lock-action@pr/82
+```
+
+```yaml
+- uses: suzuki-shunsuke/lock-action@latest
+```
+
+```yaml
+- uses: suzuki-shunsuke/lock-action@v0.1.3
+```
 
 ## How To Use
 
