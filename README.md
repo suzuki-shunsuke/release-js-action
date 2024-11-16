@@ -1,6 +1,6 @@
-# build-js-action
+# release-js-action
 
-GitHub Action to build JavaScript Actions.
+GitHub Action to release JavaScript Actions.
 
 ## LICENSE
 
