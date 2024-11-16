@@ -201,6 +201,10 @@ This action requires the following permissions:
 - `contents: write`: Create tags or branches
 - `pull-requests: write`: Post comments to pull requests
 
+## Inputs / Outputs
+
+Please see [action.yaml](action.yaml).
+
 ## LICENSE
 
 [MIT](LICENSE)
