@@ -42,7 +42,6 @@ jobs:
       - renovate-config-validator
       - ghalint
       - create-pr-branch
-      - test
     permissions: {}
     if: failure()
     steps:
@@ -79,8 +78,3 @@ jobs:
       pull-requests: write
     with:
       pr: ${{github.event.pull_request.number}}
-
-  test:
-    uses: ./.github/workflows/wc-test.yaml
-    permissions:
-      contents: write
