@@ -4,7 +4,7 @@
   },
   "dependencies": {},
   "devDependencies": {
-    "@types/node": "20.17.7",
+    "@types/node": "22.9.3",
     "@vercel/ncc": "0.38.3",
     "typescript": "5.7.2"
   }
