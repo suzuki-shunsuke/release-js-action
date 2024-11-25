@@ -109,7 +109,7 @@ runs:
 
     # Post a comment to a pull request when releasing a pre-release
     - run: |
-        aqua -c "$GITHUB_ACTION_PATH/aqua.yaml" exec -- \
+        aqua -c "$GITHUB_ACTION_PATH/aqua/aqua.yaml" exec -- \
           github-comment post \
             -config "$GITHUB_ACTION_PATH/github-comment.yaml" \
             -var "repo:${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}" \
@@ -124,7 +124,7 @@ runs:
     # Post a comment to a pull request when creating or updating pr/<pr number>
     - run: |
         PR="${VERSION#pr/}"
-        aqua -c "$GITHUB_ACTION_PATH/aqua.yaml" exec -- \
+        aqua -c "$GITHUB_ACTION_PATH/aqua/aqua.yaml" exec -- \
           github-comment post \
             -config "$GITHUB_ACTION_PATH/github-comment.yaml" \
             -pr "$PR" -k create-pr-branch \
