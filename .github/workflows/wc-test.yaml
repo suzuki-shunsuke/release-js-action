@@ -13,6 +13,7 @@ jobs:
       - run: npm ci
         working-directory: hello
       - run: npm run build
+        working-directory: hello
 
       - uses: ./
         with:
