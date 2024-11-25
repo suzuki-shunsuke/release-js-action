@@ -15,6 +15,6 @@ jobs:
         working-directory: hello
       - run: npm run build
         working-directory: hello
-      - uses: suzuki-shunsuke/release-js-action@e171d621cbdcf5e0f64b9746ed88a2210ef51bdd # v0.1.2
+      - uses: ./
         with:
           version: latest
