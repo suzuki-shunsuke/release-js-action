@@ -1,0 +1,18 @@
+name: Update the latest branch
+on:
+  push:
+    branches:
+      - main
+jobs:
+  build:
+    timeout-minutes: 15
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - run: npm ci
+      - run: npm run build
+      - uses: suzuki-shunsuke/release-js-action@e171d621cbdcf5e0f64b9746ed88a2210ef51bdd # v0.1.2
+        with:
+          version: latest
