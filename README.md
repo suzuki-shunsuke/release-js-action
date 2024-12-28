@@ -4,7 +4,7 @@ GitHub Action to release JavaScript Actions.
 
 [action.yaml](action.yaml)
 
-This action create a commit with `dist` directories and pushes a branch or tag to release a new version.
+This action create a commit with `dist` directories and pushes a branch to release a new version.
 It supports three kinds of releases:
 
 1. `pr/<pull request number>`: Create or update `pr/<pull request number>` branch when pull requests are updated
@@ -29,7 +29,7 @@ But adding compiled files has some problems:
 - Compiled files may cause conflicts
 
 To solve these issues, we stop adding compiled files in the default branch and feature branches by adding `dist` to `.gitignore`.
-Instead, we build TypeScript in CI and create branches and tags to release them.
+Instead, we build TypeScript in CI and create branches to release them.
 This means the default branch and feature branches don't work as JavaScript Action anymore.
 Instead, we specify the following versions.
 
@@ -198,7 +198,7 @@ jobs:
 
 This action requires the following permissions:
 
-- `contents: write`: Create tags or branches
+- `contents: write`: Create branches
 - `pull-requests: write`: Post comments to pull requests
 
 ## Inputs / Outputs
