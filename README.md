@@ -1,10 +1,10 @@
 # release-js-action
 
+[![License](http://img.shields.io/badge/license-mit-blue.svg?style=flat-square)](https://raw.githubusercontent.com/suzuki-shunsuke/release-js-action/main/LICENSE) | [action.yaml](action.yaml)
+
 GitHub Action to release JavaScript Actions.
 
-[action.yaml](action.yaml)
-
-This action create a commit with `dist` directories and pushes a branch to release a new version.
+This action creates a commit with `dist` directories and pushes a branch to release a new version.
 It supports three kinds of releases:
 
 1. `pr/<pull request number>`: Create or update `pr/<pull request number>` branch when pull requests are updated
@@ -204,7 +204,3 @@ This action requires the following permissions:
 ## Inputs / Outputs
 
 Please see [action.yaml](action.yaml).
-
-## LICENSE
-
-[MIT](LICENSE)
