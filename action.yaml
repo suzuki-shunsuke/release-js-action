@@ -69,7 +69,7 @@ runs:
         if gh api \
           -H "Accept: application/vnd.github+json" \
           -H "X-GitHub-Api-Version: 2022-11-28" \
-          "/repos/${GITHUB_REPOSITORY}/git/ref/${BRANCH}"; then
+          "/repos/${GITHUB_REPOSITORY}/git/ref/heads/${BRANCH}"; then
           value=true
         fi
         echo "value=$value" >> "$GITHUB_OUTPUT"
@@ -84,7 +84,7 @@ runs:
           --method DELETE \
           -H "Accept: application/vnd.github+json" \
           -H "X-GitHub-Api-Version: 2022-11-28" \
-          "/repos/${GITHUB_REPOSITORY}/git/refs/${BRANCH}"
+          "/repos/${GITHUB_REPOSITORY}/git/refs/heads/${BRANCH}"
       shell: bash
       if: steps.branch_exists.outputs.value == 'true'
       env:
