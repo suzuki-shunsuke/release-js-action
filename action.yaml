@@ -12,6 +12,14 @@ inputs:
     description: Whether a comment is posted to a pull request
     required: false
     default: "false"
+  github_token:
+    description: |
+      A GitHub Access Token.
+      The following permissions are required:
+      - contents:write : Create branches and push commits
+      - pull_requests:write : Post comments to pull requests
+    required: false
+    default: ${{github.token}}
 runs:
   using: composite
   steps:
@@ -76,7 +84,7 @@ runs:
       shell: bash
       id: branch_exists
       env:
-        GITHUB_TOKEN: ${{github.token}}
+        GITHUB_TOKEN: ${{inputs.github_token}}
         BRANCH: ${{steps.branch.outputs.value}}
     # Delete a branch before creating a new commit
     - run: |
@@ -88,7 +96,7 @@ runs:
       shell: bash
       if: steps.branch_exists.outputs.value == 'true'
       env:
-        GITHUB_TOKEN: ${{github.token}}
+        GITHUB_TOKEN: ${{inputs.github_token}}
         BRANCH: ${{steps.branch.outputs.value}}
     # Create a commit
     - run: |
@@ -104,7 +112,7 @@ runs:
               -m "$MESSAGE"
       shell: bash
       env:
-        GITHUB_TOKEN: ${{github.token}}
+        GITHUB_TOKEN: ${{inputs.github_token}}
         CURRENT_BRANCH: ${{steps.current_branch.outputs.value}}
         BRANCH: ${{steps.branch.outputs.value}}
         MESSAGE: |
@@ -121,7 +129,7 @@ runs:
       shell: bash
       if: inputs.pr != '' && startsWith(inputs.version, 'v')
       env:
-        GITHUB_TOKEN: ${{github.token}}
+        GITHUB_TOKEN: ${{inputs.github_token}}
         PR: ${{inputs.pr}}
         TAG: ${{inputs.version}}
 
@@ -137,5 +145,5 @@ runs:
       shell: bash
       if: startsWith(inputs.version, 'pr/') && inputs.is_comment == 'true'
       env:
-        GITHUB_TOKEN: ${{github.token}}
+        GITHUB_TOKEN: ${{inputs.github_token}}
         VERSION: ${{inputs.version}}
