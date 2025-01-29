@@ -3,7 +3,7 @@ description: Release JavaScript actions
 inputs:
   version:
     # "pr/<pr number>", "latest" or "<tag>"
-    description: A released version. One of `pr/<pr number>`, `latest`, or tag vX.Y.Z. 
+    description: A released version. One of `pr/<pr number>`, `latest`, or tag vX.Y.Z.
     required: true
   pr:
     description: A pull request number
@@ -62,7 +62,7 @@ runs:
         echo "value=$value" >> "$GITHUB_OUTPUT"
       shell: bash
       id: current_branch
-    
+
     # Check if the branch exists
     - run: |
         value=false
@@ -76,6 +76,7 @@ runs:
       shell: bash
       id: branch_exists
       env:
+        GH_ENTERPRISE_TOKEN: ${{github.token}}
         GITHUB_TOKEN: ${{github.token}}
         BRANCH: ${{steps.branch.outputs.value}}
     # Delete a branch before creating a new commit
@@ -88,6 +89,7 @@ runs:
       shell: bash
       if: steps.branch_exists.outputs.value == 'true'
       env:
+        GH_ENTERPRISE_TOKEN: ${{github.token}}
         GITHUB_TOKEN: ${{github.token}}
         BRANCH: ${{steps.branch.outputs.value}}
     # Create a commit
