@@ -201,9 +201,9 @@ This action requires the following permissions:
 - `contents: write`: Create branches
 - `pull-requests: write`: Post comments to pull requests
 
-### GitHub Enterprise
+### GitHub Enterprise Server
 
-If you use GitHub Enterprise, you need to set the following environment variables:
+If you use GitHub Enterprise Server, you need to set the following environment variables:
 
 - `GH_ENTERPRISE_TOKEN`
 - `GH_HOST`
