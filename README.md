@@ -201,6 +201,25 @@ This action requires the following permissions:
 - `contents: write`: Create branches
 - `pull-requests: write`: Post comments to pull requests
 
+### GitHub Enterprise
+
+If you use GitHub Enterprise, you need to set the following environment variables:
+
+- `GH_ENTERPRISE_TOKEN`
+- `GH_HOST`
+- `GITHUB_API`
+
+```yaml
+- uses: suzuki-shunsuke/release-js-action@964d814f9200bb928f4713098c38218881cfc493 # v0.1.0
+  with:
+    version: ${{inputs.tag}}
+    pr: ${{inputs.pr}}
+  env:
+    GH_ENTERPRISE_TOKEN: ${{github.token}}
+    GH_HOST: https://github.example.com/api/v3/
+    GITHUB_API: github.example.com
+```
+
 ## Inputs / Outputs
 
 Please see [action.yaml](action.yaml).
