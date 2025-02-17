@@ -3,7 +3,7 @@ description: Release JavaScript actions
 inputs:
   version:
     # "pr/<pr number>", "latest" or "<tag>"
-    description: A released version. One of `pr/<pr number>`, `latest`, or tag vX.Y.Z. 
+    description: A released version. One of `pr/<pr number>`, `latest`, or tag vX.Y.Z.
     required: true
   pr:
     description: A pull request number
@@ -70,7 +70,7 @@ runs:
         echo "value=$value" >> "$GITHUB_OUTPUT"
       shell: bash
       id: current_branch
-    
+
     # Check if the branch exists
     - run: |
         value=false
