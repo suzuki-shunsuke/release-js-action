@@ -20,6 +20,10 @@ inputs:
       - pull_requests:write : Post comments to pull requests
     required: false
     default: ${{github.token}}
+outputs:
+  branch:
+    description: A branch name for a release
+    value: ${{steps.branch.outputs.value}}
 runs:
   using: composite
   steps:
