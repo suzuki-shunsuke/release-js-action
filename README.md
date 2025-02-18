@@ -216,8 +216,8 @@ If you use GitHub Enterprise Server, you need to set the following environment v
     pr: ${{inputs.pr}}
   env:
     GH_ENTERPRISE_TOKEN: ${{github.token}}
-    GH_HOST: https://github.example.com/api/v3/
-    GITHUB_API: github.example.com
+    GH_HOST: github.example.com
+    GITHUB_API: https://github.example.com/api/v3/
 ```
 
 ## Inputs / Outputs
