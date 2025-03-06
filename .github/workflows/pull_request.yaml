@@ -32,21 +32,6 @@ jobs:
               - .github/workflows/*.yaml
               - aqua/ghalint.yaml
 
-  status-check:
-    # This job is used for main branch's branch protection rule's status check.
-    # If all dependent jobs succeed or are skipped this job succeeds.
-    timeout-minutes: 30
-    runs-on: ubuntu-latest
-    needs:
-      - update-aqua-checksums
-      - renovate-config-validator
-      - ghalint
-      - create-pr-branch
-    permissions: {}
-    if: failure()
-    steps:
-      - run: exit 1
-
   update-aqua-checksums:
     needs: path-filter
     if: needs.path-filter.outputs.update-aqua-checksums == 'true'
