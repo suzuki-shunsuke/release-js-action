@@ -50,4 +50,3 @@ jobs:
       pull-requests: write
     with:
       pr: ${{github.event.pull_request.number}}
-
