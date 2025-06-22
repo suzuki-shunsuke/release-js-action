@@ -60,8 +60,8 @@ runs:
       shell: bash
     # Fix action versions
     - run: |
-        if git ls-files | grep -E "/action\.yaml$" | grep -v -E "^\.github" >/dev/null; then
-          git ls-files | grep -E "/action\.yaml$" | grep -v -E "^\.github" |
+        if git ls-files | grep -E "^action\.ya?ml$|/action\.ya?ml$" | grep -v -E "^\.github" >/dev/null; then
+          git ls-files | grep -E "^action\.ya?ml$|/action\.ya?ml$" | grep -v -E "^\.github" |
             xargs -n 1 sed -i "s|uses: ${GITHUB_REPOSITORY}/\(.*\)@main|uses: ${GITHUB_REPOSITORY}/\1@${VERSION}|"
         fi
       shell: bash
