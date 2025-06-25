@@ -26,9 +26,6 @@ export const main = async () => {
   const distDirs = await glob("**/dist", {
     ignore: ["**/node_modules/**", ".git/**"],
   });
-  if (distDirs.length > 0) {
-    await exec.exec("git", ["add", "-f", ...distDirs]);
-  }
 
   const fixedFiles = await fixActionVersions(version, owner, repo);
 
@@ -66,7 +63,7 @@ export const main = async () => {
     branch,
     "-m",
     `chore: release ${version}\nbase revision: ${baseRevision}`,
-  ].concat(fixedFiles), {
+  ].concat(fixedFiles, distDirs), {
     env: {
       ...process.env,
       GITHUB_TOKEN: githubToken,
