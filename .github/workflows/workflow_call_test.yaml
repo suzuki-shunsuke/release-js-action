@@ -49,4 +49,5 @@ jobs:
       contents: write
       pull-requests: write
     with:
+      version: "pr/${{github.event.pull_request.number}}"
       pr: ${{github.event.pull_request.number}}
