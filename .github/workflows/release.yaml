@@ -1,6 +1,6 @@
 ---
 name: Release
-run-name: Release ${{inputs.tag}}
+run-name: Release ${{inputs.version}}
 on:
   workflow_dispatch:
     inputs:
