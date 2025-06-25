@@ -54,8 +54,6 @@ export const main = async () => {
   }
 
   await exec.exec("aqua", [
-    "-c",
-    `${process.env.GITHUB_ACTION_PATH}/aqua/aqua.yaml`,
     "exec",
     "--",
     "ghcp",
@@ -77,8 +75,6 @@ export const main = async () => {
 
   if (pr && version.startsWith("v")) {
     await exec.exec("aqua", [
-      "-c",
-      `${process.env.GITHUB_ACTION_PATH}/aqua/aqua.yaml`,
       "exec",
       "--",
       "github-comment",
@@ -104,8 +100,6 @@ export const main = async () => {
   if (version.startsWith("pr/") && isComment) {
     const prNumber = version.substring(3);
     await exec.exec("aqua", [
-      "-c",
-      `${process.env.GITHUB_ACTION_PATH}/aqua/aqua.yaml`,
       "exec",
       "--",
       "github-comment",
