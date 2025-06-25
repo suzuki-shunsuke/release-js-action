@@ -18,5 +18,6 @@ jobs:
       contents: write
       pull-requests: write
     with:
+      version: "pr/${{inputs.pr}}"
       pr: ${{fromJSON(inputs.pr)}}
       is_comment: ${{inputs.is_comment}}

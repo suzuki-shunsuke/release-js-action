@@ -23,27 +23,7 @@ inputs:
 outputs:
   branch:
     description: A branch name for a release
-    value: ${{steps.js.outputs.value}}
+    value: ${{steps.branch.outputs.value}}
 runs:
-  using: composite
-  steps:
-    # Output a link to a pull request to a Job Summary
-    - run: echo "[Pull Request](${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/pull/$PR_NUMBER)" >> "$GITHUB_STEP_SUMMARY"
-      shell: bash
-      if: inputs.pr != ''
-      env:
-        PR_NUMBER: ${{inputs.pr}}
-
-    - uses: aquaproj/aqua-installer@5c140f8fcd4035d84e5d893f1e4a9dc1283e1e4a # v4.0.1
-      with:
-        aqua_version: v2.53.3
-        enable_aqua_install: "false"
-        skip_install_aqua: "true"
-
-    - uses: suzuki-shunsuke/release-js-action/js@main
-      id: js
-      with:
-        version: ${{inputs.version}}
-        pr: ${{inputs.pr}}
-        is_comment: ${{inputs.is_comment}}
-        github_token: ${{inputs.github_token}}
+  using: "node20"
+  main: "dist/index.js"
