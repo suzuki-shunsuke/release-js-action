@@ -24,7 +24,7 @@ export const main = async () => {
   core.setOutput("branch", branch);
 
   const distDirs = await glob("**/dist", {
-    ignore: ["node_modules/**", ".git/**"],
+    ignore: ["**/node_modules/**", ".git/**"],
   });
   if (distDirs.length > 0) {
     await exec.exec("git", ["add", "-f", ...distDirs]);
@@ -134,7 +134,9 @@ async function fixActionVersions(
   owner: string,
   repo: string,
 ): Promise<string[]> {
-  const actionFiles = (await exec.getExecOutput("git", ["ls-files"]))?.stdout
+  const actionFiles = (await exec.getExecOutput("git", ["ls-files"], {
+    silent: true,
+  }))?.stdout
     .trim()
     .split("\n")
     .filter(
