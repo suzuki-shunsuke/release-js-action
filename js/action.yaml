@@ -23,7 +23,6 @@ inputs:
 outputs:
   branch:
     description: A branch name for a release
-    value: ${{steps.branch.outputs.value}}
 runs:
   using: "node20"
   main: "dist/index.js"

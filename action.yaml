@@ -53,3 +53,4 @@ runs:
         github_token: ${{inputs.github_token}}
       env:
         AQUA_CONFIG: ${{steps.action_path.outputs.value}}/aqua/aqua.yaml
+        GH_COMMENT_CONFIG: ${{steps.action_path.outputs.value}}/github-comment.yaml
