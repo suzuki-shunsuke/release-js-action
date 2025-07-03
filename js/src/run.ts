@@ -201,12 +201,13 @@ const fixActionVersions = async (
     return sha;
   }
 
-  const actionPattern = new RegExp(`^(${owner}/${repo}/.*)@main$`);
+  const actionPattern = new RegExp(`^(${owner}/${repo}(?:/.*)?)@main$`);
   const actions: ActionFile[] = [];
   for (const file of actionFiles) {
     const action = await readActionFile(repo, file, actionPattern);
     actions.push(action);
   }
+  core.info(`actions: ${actions}`);
   const changedFiles = new Set<string>();
   while (true) {
     changedFiles.clear();
