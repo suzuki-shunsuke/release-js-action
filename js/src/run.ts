@@ -40,10 +40,6 @@ export const main = async () => {
     nodir: true,
   });
 
-  const currentBranch = (
-    await exec.getExecOutput("git", ["branch", "--show-current"])
-  ).stdout.trim();
-
   const octokit = github.getOctokit(githubToken);
 
   await deleteBranch(octokit, branch);

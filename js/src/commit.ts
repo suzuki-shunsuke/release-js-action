@@ -1,4 +1,5 @@
 import type * as github from "@actions/github";
+import * as core from "@actions/core";
 import type { Octokit } from "@octokit/rest";
 import { readFile, stat } from "fs/promises";
 
@@ -38,14 +39,16 @@ export const createCommit = async (
   const baseBranch = await getBaseBranch(octokit, opts);
   const treeSHA = await getTreeSHA(octokit, opts, baseBranch);
   // Create a commit
+  const parents = opts.noParent
+      ? undefined
+      : (opts.parent ? [opts.parent] : [baseBranch.target.oid]);
+  core.info(`creating a commit tree=${treeSHA} parents=${parents}`);
   const commit = await octokit.rest.git.createCommit({
     owner: opts.owner,
     repo: opts.repo,
     message: opts.message,
     tree: treeSHA,
-    parents: opts.noParent
-      ? undefined
-      : (opts.parent ? [opts.parent] : [baseBranch.target.oid]),
+    parents: parents,
   });
   if (baseBranch.name === opts.branch) {
     // Update the reference if the branch exists
@@ -77,6 +80,7 @@ const updateRef = async (
   sha: string,
 ): Promise<Result> => {
   // Update the reference if the branch exists
+  core.info(`updating ref=heads/${opts.branch} sha=${sha}`);
   const updatedRef = await octokit.rest.git.updateRef({
     owner: opts.owner,
     repo: opts.repo,
@@ -96,6 +100,7 @@ const createRef = async (
   opts: Options,
   sha: string,
 ): Promise<Result> => {
+  core.info(`creating ref=heads/${opts.branch} sha=${sha}`);
   const createdRef = await octokit.rest.git.createRef({
     owner: opts.owner,
     repo: opts.repo,
@@ -124,6 +129,7 @@ const getTreeSHA = async (
   for (const filePath of opts.deletedFiles || []) {
     tree.push(await createDeletedTreeFile(opts, filePath));
   }
+  core.info(`creating a tree with ${tree.length} files`);
   const treeResp = await octokit.rest.git.createTree({
     owner: opts.owner,
     repo: opts.repo,
