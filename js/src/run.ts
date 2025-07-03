@@ -56,7 +56,7 @@ export const main = async () => {
       branch,
       message:
         `chore: prepare release ${version}\nbase revision: ${baseRevision}`,
-      parent: currentBranch,
+      parent: sha,
       files: distFiles,
     });
     sha = result?.commit.sha || baseRevision;
