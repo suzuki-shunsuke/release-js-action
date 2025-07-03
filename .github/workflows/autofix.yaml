@@ -14,7 +14,7 @@ jobs:
       - uses: aquaproj/aqua-installer@d1fe50798dbadd4eb5b98957290ca175f6b4870f # v4.0.2
         with:
           aqua_version: v2.53.3
+      - run: aqua upc -prune
         env:
           GITHUB_TOKEN: ${{github.token}}
-      - run: aqua upc -prune
       - uses: suzuki-shunsuke/autofixci-action@a148ca710fd8bf5d9959d5d7604018ce8a77bad0 # v1.3.2-1

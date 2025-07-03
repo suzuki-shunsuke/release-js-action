@@ -32,9 +32,14 @@ jobs:
         env:
           GITHUB_TOKEN: ${{github.token}}
           PR: ${{inputs.pr}}
-      - run: npm ci
+      - uses: aquaproj/aqua-installer@d1fe50798dbadd4eb5b98957290ca175f6b4870f # v4.0.2
+        with:
+          aqua_version: v2.53.3
+      - run: deno install
         working-directory: js
-      - run: npm run build
+        env:
+          GITHUB_TOKEN: ${{github.token}}
+      - run: deno task bundle
         working-directory: js
 
       - uses: ./
