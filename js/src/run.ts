@@ -207,7 +207,7 @@ const fixActionVersions = async (
     const action = await readActionFile(repo, file, actionPattern);
     actions.push(action);
   }
-  core.info(`actions: ${actions}`);
+  core.info(`actions: ${JSON.stringify(actions)}`);
   const changedFiles = new Set<string>();
   while (true) {
     changedFiles.clear();
