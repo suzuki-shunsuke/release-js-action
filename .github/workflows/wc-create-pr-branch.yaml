@@ -45,3 +45,6 @@ jobs:
           version: ${{inputs.version}}
           pr: ${{inputs.pr}}
           is_comment: ${{inputs.is_comment}}
+        env:
+          AQUA_CONFIG: ${{github.workspace}}/aqua/aqua.yaml
+          GH_COMMENT_CONFIG: ${{github.workspace}}/github-comment.yaml
