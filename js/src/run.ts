@@ -197,6 +197,7 @@ const fixActionVersions = async (
 ): Promise<string> => {
   const actionFiles = await listActionFiles();
   if (actionFiles.length === 0) {
+    core.info("No action files found, skipping version pinning.");
     return sha;
   }
 
@@ -221,6 +222,7 @@ const fixActionVersions = async (
         }
         // act depends on action
         // Fix content and remove action from dependencies
+        core.info(`Pinning action ${owner}/${repo}/${action.name} to ${sha}`);
         act.content.replaceAll(
           `uses: ${owner}/${repo}/${action.name}@main`,
           `uses: ${owner}/${repo}/${action.name}@${sha}`,
@@ -231,6 +233,13 @@ const fixActionVersions = async (
     }
     if (changedFiles.size === 0) {
       break;
+    }
+    // Fix files
+    for (const act of actions) {
+      if (changedFiles.has(act.path)) {
+        core.info(`Updating action file ${act.path}`);
+        await fs.writeFile(act.path, act.content, "utf-8");
+      }
     }
     // create a commit
     const result = await commit.createCommit(octokit, {
