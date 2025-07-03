@@ -52,7 +52,7 @@ export const main = async () => {
       branch,
       message:
         `chore: prepare release ${version}\nbase revision: ${baseRevision}`,
-      parent: sha,
+      baseSHA: sha,
       files: distFiles,
     });
     sha = result?.commit.sha || baseRevision;
@@ -238,7 +238,7 @@ const fixActionVersions = async (
       repo,
       branch,
       message: `chore: prepare release ${version}\nbase revision: ${baseSHA}`,
-      parent: branch,
+      baseBranch: branch,
       files: [...changedFiles],
     });
     sha = result?.commit.sha || sha;

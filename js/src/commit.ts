@@ -10,7 +10,8 @@ export type Options = {
   message: string;
   empty?: boolean; // if true, create an empty commit
   files?: string[];
-  parent?: string;
+  baseSHA?: string; // By default, the base branch's latest commit is used
+  baseBranch?: string; // By default, if branch exists, it is used as the base branch. Otherwise, the default branch is used
   noParent?: boolean; // if true, do not use parent commit
   // baseDirectory?: string;
   deletedFiles?: string[]; // files to delete
@@ -41,7 +42,7 @@ export const createCommit = async (
   // Create a commit
   const parents = opts.noParent
       ? undefined
-      : (opts.parent ? [opts.parent] : [baseBranch.target.oid]);
+      : [baseBranch.target.oid];
   core.info(`creating a commit tree=${treeSHA} parents=${parents}`);
   const commit = await octokit.rest.git.createCommit({
     owner: opts.owner,
@@ -50,7 +51,12 @@ export const createCommit = async (
     tree: treeSHA,
     parents: parents,
   });
-  if (baseBranch.name === opts.branch) {
+  const branch = await getBranch(octokit, {
+    owner: opts.owner,
+    repo: opts.repo,
+    branch: opts.branch,
+  });
+  if (branch) {
     // Update the reference if the branch exists
     return await updateRef(octokit, opts, commit.data.sha);
   }
@@ -185,10 +191,29 @@ const createDeletedTreeFile = async (
 };
 
 const getBaseBranch = async (octokit: GitHub, opts: Options): Promise<Ref> => {
-  if (!opts.branch) {
-    throw new Error("branch is not specified");
+  if (opts.baseBranch) {
+    if (opts.baseSHA) {
+      return {
+        target: {
+          oid: opts.baseSHA,
+          tree: {
+            oid: await getTree(octokit, opts.owner, opts.repo, opts.baseSHA),
+          },
+        },
+      };
+    }
+    const branch = await getBranch(octokit, {
+      owner: opts.owner,
+      repo: opts.repo,
+      branch: opts.baseBranch,
+    });
+    if (branch === undefined) {
+      throw new Error(
+        `Branch ${opts.branch} does not exist in ${opts.owner}/${opts.repo}`,
+      );
+    }
+    return branch;
   }
-
   // Check if the specified branch exists
   const branch = await getBranch(octokit, {
     owner: opts.owner,
@@ -210,7 +235,6 @@ const getDefaultBranch = async (
     `query($owner: String!, $repo: String!) {
      repository(owner: $owner, name: $repo) {
        defaultBranchRef {
-         name
          target {
            ... on Commit {
              oid
@@ -238,7 +262,6 @@ type getBranchInput = {
 };
 
 type Ref = {
-  name: string;
   target: {
     oid: string;
     tree: {
@@ -262,7 +285,6 @@ const getBranch = async (
     `query($owner: String!, $repo: String!, $ref: String!) {
   repository(owner: $owner, name: $repo) {
     ref(qualifiedName: $ref) {
-      name
       target {
         ... on Commit {
           oid
@@ -343,4 +365,42 @@ const getFileMode = (mode: number): FileMode => {
     default:
       return "100644";
   }
+};
+
+type getTreeResponse = {
+  repository: {
+    object: {
+      tree: {
+        oid: string;
+      }
+    };
+  };
+};
+
+const getTree = async (
+  octokit: GitHub,
+  owner: string,
+  repo: string,
+  oid: string,
+): Promise<string> => {
+  // Get the branch
+  const resp = await octokit.graphql<getTreeResponse>(
+    `query($owner: String!, $repo: String!, $oid: GitObjectID!) {
+  repository(owner: $owner, name: $repo) {
+    object(oid: $oid) {
+      ... on Commit {
+        tree {
+          oid
+        }
+      }
+    }
+  }
+}`,
+    {
+      owner: owner,
+      repo: repo,
+      oid: oid,
+    },
+  );
+  return resp.repository.object.tree.oid;
 };
