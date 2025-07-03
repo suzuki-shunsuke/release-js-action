@@ -129,14 +129,15 @@ const getTreeSHA = async (
   for (const filePath of opts.deletedFiles || []) {
     tree.push(await createDeletedTreeFile(opts, filePath));
   }
-  core.info(`creating a tree with ${tree.length} files`);
+  const baseTree = opts.noParent ? undefined : baseBranch.target.tree.oid;
+  core.info(`creating a tree with ${tree.length} files base_tree=${baseTree}`);
   const treeResp = await octokit.rest.git.createTree({
     owner: opts.owner,
     repo: opts.repo,
     tree: tree,
     // If not provided, GitHub will create a new Git tree object from only the entries defined in the tree parameter.
     // If you create a new commit pointing to such a tree, then all files which were a part of the parent commit's tree and were not defined in the tree parameter will be listed as deleted by the new commit.
-    base_tree: opts.noParent ? undefined : baseBranch.target.tree.oid,
+    base_tree: baseTree,
   });
   return treeResp.data.sha;
 };
