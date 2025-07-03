@@ -1,10 +1,11 @@
 {
   "tasks": {
-    "dev": "deno run --watch main.ts"
+    "bundle": "deno run -A scripts/build.ts"
   },
   "imports": {
-    "@std/assert": "jsr:@std/assert@1",
-    "@std/path": "jsr:@std/path@^1.1.1",
+    "@actions/core": "npm:@actions/core@^1.11.1",
+    "@deno/dnt": "jsr:@deno/dnt@^0.42.1",
+    "@std/path": "jsr:@std/path@1.1.0",
     "@std/yaml": "jsr:@std/yaml@^1.0.8",
     "@suzuki-shunsuke/commit-ts": "jsr:@suzuki-shunsuke/commit-ts@^0.0.1"
   }

@@ -1,4 +1,4 @@
-import * as core from "@actions/core";
+import * as core from "npm:@actions/core";
 import { main } from "./run";
 
 try {
