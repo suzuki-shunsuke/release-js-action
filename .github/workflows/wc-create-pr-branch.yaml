@@ -40,7 +40,7 @@ jobs:
       - run: npm run build
         working-directory: js
 
-      - uses: ./
+      - uses: ./js
         with:
           version: ${{inputs.version}}
           pr: ${{inputs.pr}}
