@@ -1,12 +1,12 @@
-import { glob } from "npm:glob";
+import { glob } from "glob";
 import * as fs from "fs/promises";
-import * as core from "npm:@actions/core";
-import * as exec from "npm:@actions/exec";
-import * as github from "npm:@actions/github";
-import * as commit from "@suzuki-shunsuke/commit-ts";
-import { basename, dirname } from "@std/path";
-import * as yaml from "@std/yaml";
-import { z } from "npm:zod";
+import * as core from "@actions/core";
+import * as exec from "@actions/exec";
+import * as github from "@actions/github";
+import * as commit from "./commit";
+import { basename, dirname } from "path";
+import * as yaml from "js-yaml";
+import { z } from "zod";
 
 const Action = z.object({
   runs: z.optional(z.object({
@@ -80,7 +80,7 @@ export const main = async () => {
       "github-comment",
       "post",
       "-var",
-      `repo:${Deno.env.get("GITHUB_SERVER_URL")}/${owner}/${repo}`,
+      `repo:${process.env.GITHUB_SERVER_URL}/${owner}/${repo}`,
       "-pr",
       pr,
       "-k",
@@ -89,7 +89,7 @@ export const main = async () => {
       `tag:${version}`,
     ], {
       env: {
-        ...Deno.env.toObject(),
+        ...process.env,
         GITHUB_TOKEN: githubToken,
       },
     });
@@ -107,12 +107,12 @@ export const main = async () => {
       "-k",
       "create-pr-branch",
       "-var",
-      `repo:${Deno.env.get("GITHUB_SERVER_URL")}/${owner}/${repo}`,
+      `repo:${process.env.GITHUB_SERVER_URL}/${owner}/${repo}`,
       "-var",
       `pr:${prNumber}`,
     ], {
       env: {
-        ...Deno.env.toObject(),
+        ...process.env,
         GITHUB_TOKEN: githubToken,
       },
     });
@@ -170,7 +170,7 @@ const readActionFile = async (
 ): Promise<ActionFile> => {
   const dir = dirname(file);
   const content = await fs.readFile(file, "utf-8");
-  const action = Action.parse(yaml.parse(content));
+  const action = Action.parse(yaml.load(content));
   const actions = new Set<string>();
   for (const step of action.runs?.steps ?? []) {
     if (!step.uses) {
