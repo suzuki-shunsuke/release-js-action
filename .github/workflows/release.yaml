@@ -18,4 +18,5 @@ jobs:
       pull-requests: write
     with:
       version: ${{inputs.version}}
+      # https://github.com/orgs/community/discussions/67182
       pr: ${{inputs.pr && fromJSON(inputs.pr) || ''}}
