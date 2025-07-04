@@ -213,13 +213,14 @@ const fixActionVersions = async (
     core.info(`action name=${action.name} path=${action.path} dependencies=${JSON.stringify([...action.dependencies])}`);
     actions.push(action);
   }
-  const changedFiles = new Set<string>();
   while (true) {
-    changedFiles.clear();
+    const changedFiles = new Set<string>();
+    const pinnedActions = new Set<string>();
     for (const action of actions) {
       if (action.dependencies.size !== 0) {
         continue;
       }
+      pinnedActions.add(action.name);
       // action does not depend on other actions
       // So pin the action
       for (const act of actions) {
@@ -233,7 +234,6 @@ const fixActionVersions = async (
           `uses: ${action.name}@main`,
           `uses: ${action.name}@${sha}`,
         );
-        act.dependencies.delete(action.name);
         changedFiles.add(act.path);
       }
     }
@@ -245,6 +245,11 @@ const fixActionVersions = async (
       if (changedFiles.has(act.path)) {
         core.info(`Updating action file ${act.path}`);
         await fs.writeFile(act.path, act.content, "utf-8");
+      }
+    }
+    for (const pinnedAction of pinnedActions) {
+      for (const action of actions) {
+        action.dependencies.delete(pinnedAction);
       }
     }
     // create a commit
