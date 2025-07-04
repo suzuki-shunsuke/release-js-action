@@ -1,5 +1,8 @@
 # Available versions
 
+This document describes available versions of actions released by release-js-action.
+This document is referred from actions using release-js-action. 
+
 Actions released by release-js-action don't work on the default branch and feature branches because built JavaScript files aren't committed to those branches.
 
 [suzuki-shunsuke/lock-action](https://github.com/suzuki-shunsuke/lock-action) uses release-js-action, so we describe available versions using lock-action.
@@ -19,8 +22,6 @@ uses: suzuki-shunsuke/lock-action@feature-1
 The following versions are available.
 
 1. [Release versions](https://github.com/suzuki-shunsuke/lock-action/releases)
-
-e.g.
 
 ```yaml
 uses: suzuki-shunsuke/lock-action@v0.1.1
