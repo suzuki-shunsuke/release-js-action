@@ -1,0 +1,32 @@
+name: Release JavaScript actions
+description: Release JavaScript actions
+inputs:
+  version:
+    # "pr/<pr number>", "latest" or "<tag>"
+    description: A released version. One of `pr/<pr number>`, `latest`, or tag vX.Y.Z.
+    required: true
+  pr:
+    description: A pull request number
+    required: false
+  is_comment:
+    description: Whether a comment is posted to a pull request
+    required: false
+    default: "false"
+  github_token:
+    description: |
+      A GitHub Access Token.
+      The following permissions are required:
+      - contents:write : Create branches and push commits
+      - pull_requests:write : Post comments to pull requests
+    required: false
+    default: ${{github.token}}
+  files:
+    description: |
+      Files to be committed.
+    required: false
+outputs:
+  branch:
+    description: A branch name for a release
+runs:
+  using: "node20"
+  main: "dist/index.js"

@@ -20,10 +20,14 @@ inputs:
       - pull_requests:write : Post comments to pull requests
     required: false
     default: ${{github.token}}
+  files:
+    description: |
+      Files to be committed.
+    required: false
 outputs:
   branch:
     description: A branch name for a release
-    value: ${{steps.branch.outputs.value}}
+    value: ${{steps.js.outputs.value}}
 runs:
   using: composite
   steps:
@@ -34,120 +38,24 @@ runs:
       env:
         PR_NUMBER: ${{inputs.pr}}
 
-    # Install aqua for github-commment
+    - shell: bash
+      id: action_path
+      run: echo "value=$GITHUB_ACTION_PATH" >> "$GITHUB_OUTPUT"
+
     - uses: aquaproj/aqua-installer@d1fe50798dbadd4eb5b98957290ca175f6b4870f # v4.0.2
       with:
         aqua_version: v2.53.3
         enable_aqua_install: "false"
         skip_install_aqua: "true"
 
-    - run: echo "value=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
-      shell: bash
-      id: base_revision
-    - run: |
-        if [ "$VERSION" = latest ] || [[ "$VERSION" =~ ^pr/ ]]; then
-          echo "value=$VERSION" >> "$GITHUB_OUTPUT"
-          exit 0
-        fi
-        echo "value=release-$VERSION" >> "$GITHUB_OUTPUT"
-      id: branch
-      shell: bash
+    - uses: suzuki-shunsuke/release-js-action/js@main
+      id: js
+      with:
+        version: ${{inputs.version}}
+        pr: ${{inputs.pr}}
+        is_comment: ${{inputs.is_comment}}
+        github_token: ${{inputs.github_token}}
+        files: ${{inputs.files}}
       env:
-        VERSION: ${{inputs.version}}
-
-    # git add dist
-    - run: find . -name dist -type d | grep -v node_modules | grep -v .git | xargs git add -f
-      shell: bash
-    # Fix action versions
-    - run: |
-        if git ls-files | grep -E "^action\.ya?ml$|/action\.ya?ml$" | grep -v -E "^\.github" >/dev/null; then
-          git ls-files | grep -E "^action\.ya?ml$|/action\.ya?ml$" | grep -v -E "^\.github" |
-            xargs -n 1 sed -i "s|uses: ${GITHUB_REPOSITORY}/\(.*\)@main|uses: ${GITHUB_REPOSITORY}/\1@${VERSION}|"
-        fi
-      shell: bash
-      env:
-        VERSION: ${{inputs.version}}
-
-    # Get the current branch
-    - run: |
-        value=$(git branch | grep "^\* " | sed -e "s/^\* \(.*\)/\1/")
-        echo "value=$value" >> "$GITHUB_OUTPUT"
-      shell: bash
-      id: current_branch
-
-    # Check if the branch exists
-    - run: |
-        value=false
-        if gh api \
-          -H "Accept: application/vnd.github+json" \
-          -H "X-GitHub-Api-Version: 2022-11-28" \
-          "/repos/${GITHUB_REPOSITORY}/git/ref/heads/${BRANCH}"; then
-          value=true
-        fi
-        echo "value=$value" >> "$GITHUB_OUTPUT"
-      shell: bash
-      id: branch_exists
-      env:
-        GITHUB_TOKEN: ${{inputs.github_token}}
-        BRANCH: ${{steps.branch.outputs.value}}
-    # Delete a branch before creating a new commit
-    - run: |
-        gh api \
-          --method DELETE \
-          -H "Accept: application/vnd.github+json" \
-          -H "X-GitHub-Api-Version: 2022-11-28" \
-          "/repos/${GITHUB_REPOSITORY}/git/refs/heads/${BRANCH}"
-      shell: bash
-      if: steps.branch_exists.outputs.value == 'true'
-      env:
-        GITHUB_TOKEN: ${{inputs.github_token}}
-        BRANCH: ${{steps.branch.outputs.value}}
-    # Create a commit
-    - run: |
-        {
-          git diff --cached --name-only
-          git diff --name-only
-        } |
-          xargs aqua -c "$GITHUB_ACTION_PATH/aqua/aqua.yaml" exec -- \
-            ghcp commit \
-              -r "$GITHUB_REPOSITORY" \
-              --parent "$CURRENT_BRANCH" \
-              -b "$BRANCH" \
-              -m "$MESSAGE"
-      shell: bash
-      env:
-        GITHUB_TOKEN: ${{inputs.github_token}}
-        CURRENT_BRANCH: ${{steps.current_branch.outputs.value}}
-        BRANCH: ${{steps.branch.outputs.value}}
-        MESSAGE: |
-          chore: release ${{inputs.version}}
-          base revision: ${{steps.base_revision.outputs.value}}
-
-    # Post a comment to a pull request when releasing a pre-release
-    - run: |
-        aqua -c "$GITHUB_ACTION_PATH/aqua/aqua.yaml" exec -- \
-          github-comment post \
-            -config "$GITHUB_ACTION_PATH/github-comment.yaml" \
-            -var "repo:${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}" \
-            -pr "$PR" -k pre-release -var "tag:$TAG"
-      shell: bash
-      if: inputs.pr != '' && startsWith(inputs.version, 'v')
-      env:
-        GITHUB_TOKEN: ${{inputs.github_token}}
-        PR: ${{inputs.pr}}
-        TAG: ${{inputs.version}}
-
-    # Post a comment to a pull request when creating or updating pr/<pr number>
-    - run: |
-        PR="${VERSION#pr/}"
-        aqua -c "$GITHUB_ACTION_PATH/aqua/aqua.yaml" exec -- \
-          github-comment post \
-            -config "$GITHUB_ACTION_PATH/github-comment.yaml" \
-            -pr "$PR" -k create-pr-branch \
-            -var "repo:${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}" \
-            -var "pr:$PR"
-      shell: bash
-      if: startsWith(inputs.version, 'pr/') && inputs.is_comment == 'true'
-      env:
-        GITHUB_TOKEN: ${{inputs.github_token}}
-        VERSION: ${{inputs.version}}
+        AQUA_CONFIG: ${{steps.action_path.outputs.value}}/aqua/aqua.yaml
+        GH_COMMENT_CONFIG: ${{steps.action_path.outputs.value}}/github-comment.yaml

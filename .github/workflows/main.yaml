@@ -5,18 +5,8 @@ on:
       - main
 jobs:
   build:
-    timeout-minutes: 15
-    runs-on: ubuntu-latest
+    uses: ./.github/workflows/wc-create-pr-branch.yaml
     permissions:
       contents: write
-    steps:
-      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
-        with:
-          persist-credentials: false
-      - run: npm ci
-        working-directory: hello
-      - run: npm run build
-        working-directory: hello
-      - uses: ./
-        with:
-          version: latest
+    with:
+      version: latest

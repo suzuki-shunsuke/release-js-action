@@ -37,29 +37,29 @@ Instead, we specify the following versions.
 1. `latest`: A branch where the default branch is built
 1. GitHub Releases
 
-For example, [lock-action](https://github.com/suzuki-shunsuke/lock-action) uses this action.
+For example, [release-js-action](https://github.com/suzuki-shunsuke/release-js-action) uses this action.
 The following versions don't work:
 
 ```yaml
-- uses: suzuki-shunsuke/lock-action@main
+- uses: suzuki-shunsuke/release-js-action@main
 ```
 
 ```yaml
-- uses: suzuki-shunsuke/lock-action@feature-branch-1
+- uses: suzuki-shunsuke/release-js-action@feature-branch-1
 ```
 
 Instead, the following versions are available:
 
 ```yaml
-- uses: suzuki-shunsuke/lock-action@pr/82
+- uses: suzuki-shunsuke/release-js-action@pr/82
 ```
 
 ```yaml
-- uses: suzuki-shunsuke/lock-action@latest
+- uses: suzuki-shunsuke/release-js-action@latest
 ```
 
 ```yaml
-- uses: suzuki-shunsuke/lock-action@v0.1.3
+- uses: suzuki-shunsuke/release-js-action@v0.1.3
 ```
 
 ## How To Use
@@ -79,7 +79,7 @@ In workflows,
 
 e.g.
 
-- [`pr/<pull request number>`](https://github.com/suzuki-shunsuke/lock-action/blob/main/.github/workflows/wc-create-pr-branch.yaml)
+- [`pr/<pull request number>`](https://github.com/suzuki-shunsuke/release-js-action/blob/main/.github/workflows/wc-create-pr-branch.yaml)
 
 <details>
 <summary>Example Workflow (`Pull Request`)</summary>
@@ -125,7 +125,7 @@ jobs:
 
 </details>
 
-- [latest](https://github.com/suzuki-shunsuke/lock-action/blob/main/.github/workflows/main.yaml)
+- [latest](https://github.com/suzuki-shunsuke/release-js-action/blob/main/.github/workflows/main.yaml)
 
 <details>
 <summary>Example Workflow (latest)</summary>
@@ -153,7 +153,7 @@ jobs:
 
 </details>
 
-- [Release](https://github.com/suzuki-shunsuke/lock-action/blob/main/.github/workflows/release.yaml)
+- [Release](https://github.com/suzuki-shunsuke/release-js-action/blob/main/.github/workflows/release.yaml)
 
 <details>
 <summary>Example Workflow (Release)</summary>
@@ -223,3 +223,38 @@ If you use GitHub Enterprise Server, you need to set the following environment v
 ## Inputs / Outputs
 
 Please see [action.yaml](action.yaml).
+
+## Available versions
+
+> [!CAUTION]
+> As of release-js-action v0.2.0, available versions were changed.
+> `main` branch and feature branches don't work anymore because `js/dist/*.js` aren't committed.
+>
+> ```yaml
+> # This never works as js/dist/index.js doesn't exist.
+> uses: suzuki-shunsuke/release-js-action@main
+> ```
+
+The following versions are available.
+
+1. [Release versions](https://github.com/suzuki-shunsuke/release-js-action/releases)
+
+```yaml
+uses: suzuki-shunsuke/release-js-action@v0.2.0
+```
+
+2. [Pull Request versions](https://github.com/suzuki-shunsuke/release-js-action/branches/all?query=pr%2F&lastTab=overview): These versions are removed when we feel unnecessary. These versions are used to test pull requests.
+
+```yaml
+uses: suzuki-shunsuke/release-js-action@pr/299
+```
+
+3. [latest branch](https://github.com/suzuki-shunsuke/release-js-action/tree/latest): [This branch is built by CI when the main branch is updated](https://github.com/suzuki-shunsuke/release-js-action/blob/latest/.github/workflows/main.yaml). Note that we push commits to the latest branch forcibly.
+
+```yaml
+uses: suzuki-shunsuke/release-js-action@latest
+```
+
+Pull Request versions and the latest branch are unstable.
+These versions are for testing.
+You should use the latest release version in production.

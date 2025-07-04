@@ -1,12 +1,15 @@
 ---
-name: wc-create-pr-branch
-run-name: wc-create-pr-branch (${{inputs.pr}})
+name: Release (workflow call)
 on:
   workflow_call:
     inputs:
-      pr:
-        description: "Pull Request Number"
+      version:
+        description: Version
         required: true
+        type: string
+      pr:
+        description: Pull Request Number
+        required: false
         type: number
       is_comment:
         description: If the comment is posted
@@ -15,8 +18,8 @@ on:
         type: boolean
 jobs:
   create-pr-branch:
-    timeout-minutes: 30
-    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    runs-on: ubuntu-24.04
     permissions:
       contents: write
       pull-requests: write
@@ -29,12 +32,19 @@ jobs:
         env:
           GITHUB_TOKEN: ${{github.token}}
           PR: ${{inputs.pr}}
-      - run: npm ci
-        working-directory: hello
-      - run: npm run build
-        working-directory: hello
-
-      - uses: ./
+      - uses: aquaproj/aqua-installer@d1fe50798dbadd4eb5b98957290ca175f6b4870f # v4.0.2
         with:
-          version: pr/${{inputs.pr}}
+          aqua_version: v2.53.3
+      - run: npm ci
+        working-directory: js
+      - run: npm run build
+        working-directory: js
+
+      - uses: ./js
+        with:
+          version: ${{inputs.version}}
+          pr: ${{inputs.pr}}
           is_comment: ${{inputs.is_comment}}
+        env:
+          AQUA_CONFIG: ${{github.workspace}}/aqua/aqua.yaml
+          GH_COMMENT_CONFIG: ${{github.workspace}}/github-comment.yaml

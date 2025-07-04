@@ -5,33 +5,18 @@ on:
   workflow_dispatch:
     inputs:
       tag:
-        description: "tag"
+        description: version
         required: true
       pr:
         description: "pr number (pre-release)"
         required: false
 jobs:
   release:
-    timeout-minutes: 30
-    runs-on: ubuntu-latest
+    uses: ./.github/workflows/wc-create-pr-branch.yaml
     permissions:
       contents: write
       pull-requests: write
-    steps:
-      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
-        with:
-          persist-credentials: false
-      - run: gh pr checkout "$PR"
-        if: inputs.pr != ''
-        env:
-          GITHUB_TOKEN: ${{github.token}}
-          PR: ${{inputs.pr}}
-      - run: npm ci
-        working-directory: hello
-      - run: npm run build
-        working-directory: hello
-
-      - uses: ./
-        with:
-          version: ${{inputs.tag}}
-          pr: ${{inputs.pr}}
+    with:
+      version: ${{inputs.tag}}
+      # https://github.com/orgs/community/discussions/67182
+      pr: ${{inputs.pr && fromJSON(inputs.pr) || ''}}
