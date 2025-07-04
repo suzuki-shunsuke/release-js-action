@@ -22,6 +22,7 @@ const waitAfterCommit = () => new Promise(resolve => setTimeout(resolve, 1000));
 export const main = async () => {
   const version = core.getInput("version", { required: true });
   const pr = core.getInput("pr");
+  const files = core.getMultilineInput("files");
   const isComment = core.getBooleanInput("is_comment");
   const githubToken = core.getInput("github_token", { required: true });
 
@@ -47,7 +48,7 @@ export const main = async () => {
   await deleteBranch(octokit, branch);
 
   let sha = baseRevision;
-  if (distFiles.length !== 0) {
+  if (distFiles.length !== 0 || files.length !== 0) {
     const result = await commit.createCommit(octokit, {
       owner,
       repo,
@@ -55,7 +56,7 @@ export const main = async () => {
       message:
         `chore: prepare release ${version}\nbase revision: ${baseRevision}`,
       baseSHA: sha,
-      files: distFiles,
+      files: distFiles.concat(files).filter(f => f !== ""),
     });
     sha = result?.commit.sha || baseRevision;
     await waitAfterCommit();

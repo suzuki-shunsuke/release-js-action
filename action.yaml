@@ -20,6 +20,10 @@ inputs:
       - pull_requests:write : Post comments to pull requests
     required: false
     default: ${{github.token}}
+  files:
+    description: |
+      Files to be committed.
+    required: false
 outputs:
   branch:
     description: A branch name for a release
@@ -51,6 +55,7 @@ runs:
         pr: ${{inputs.pr}}
         is_comment: ${{inputs.is_comment}}
         github_token: ${{inputs.github_token}}
+        files: ${{inputs.files}}
       env:
         AQUA_CONFIG: ${{steps.action_path.outputs.value}}/aqua/aqua.yaml
         GH_COMMENT_CONFIG: ${{steps.action_path.outputs.value}}/github-comment.yaml
