@@ -181,7 +181,7 @@ const readActionFile = async (
   return {
     content,
     path: file,
-    name: `${repo}/${dir}`,
+    name: dir === "." ? repo : `${repo}/${dir}`,
     dependencies: actions,
   };
 };
