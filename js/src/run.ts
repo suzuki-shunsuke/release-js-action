@@ -225,7 +225,7 @@ const fixActionVersions = async (
         // act depends on action
         // Fix content and remove action from dependencies
         core.info(`Pinning action ${action.name} to ${sha}`);
-        act.content.replaceAll(
+        act.content = act.content.replaceAll(
           `uses: ${action.name}@main`,
           `uses: ${action.name}@${sha}`,
         );
