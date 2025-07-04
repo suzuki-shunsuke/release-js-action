@@ -200,11 +200,12 @@ const fixActionVersions = async (
     core.info("No action files found, skipping version pinning.");
     return sha;
   }
+  const repoFullName = `${owner}/${repo}`;
 
-  const actionPattern = new RegExp(`^(${owner}/${repo}(?:/.*)?)@main$`);
+  const actionPattern = new RegExp(`^(${repoFullName}(?:/.*)?)@main$`);
   const actions: ActionFile[] = [];
   for (const file of actionFiles) {
-    const action = await readActionFile(repo, file, actionPattern);
+    const action = await readActionFile(repoFullName, file, actionPattern);
     core.info(`action name=${action.name} path=${action.path} dependencies=${JSON.stringify([...action.dependencies])}`);
     actions.push(action);
   }
@@ -223,10 +224,10 @@ const fixActionVersions = async (
         }
         // act depends on action
         // Fix content and remove action from dependencies
-        core.info(`Pinning action ${owner}/${repo}/${action.name} to ${sha}`);
+        core.info(`Pinning action ${action.name} to ${sha}`);
         act.content.replaceAll(
-          `uses: ${owner}/${repo}/${action.name}@main`,
-          `uses: ${owner}/${repo}/${action.name}@${sha}`,
+          `uses: ${action.name}@main`,
+          `uses: ${action.name}@${sha}`,
         );
         act.dependencies.delete(action.name);
         changedFiles.add(act.path);
