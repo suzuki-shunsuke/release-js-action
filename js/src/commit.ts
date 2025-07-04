@@ -191,17 +191,17 @@ const createDeletedTreeFile = async (
 };
 
 const getBaseBranch = async (octokit: GitHub, opts: Options): Promise<Ref> => {
-  if (opts.baseBranch) {
-    if (opts.baseSHA) {
-      return {
-        target: {
-          oid: opts.baseSHA,
-          tree: {
-            oid: await getTree(octokit, opts.owner, opts.repo, opts.baseSHA),
-          },
+  if (opts.baseSHA) {
+    return {
+      target: {
+        oid: opts.baseSHA,
+        tree: {
+          oid: await getTree(octokit, opts.owner, opts.repo, opts.baseSHA),
         },
-      };
-    }
+      },
+    };
+  }
+  if (opts.baseBranch) {
     const branch = await getBranch(octokit, {
       owner: opts.owner,
       repo: opts.repo,
