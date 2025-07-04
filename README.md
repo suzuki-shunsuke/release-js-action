@@ -226,35 +226,4 @@ Please see [action.yaml](action.yaml).
 
 ## Available versions
 
-> [!CAUTION]
-> As of release-js-action v0.2.0, available versions were changed.
-> `main` branch and feature branches don't work anymore because `js/dist/*.js` aren't committed.
->
-> ```yaml
-> # This never works as js/dist/index.js doesn't exist.
-> uses: suzuki-shunsuke/release-js-action@main
-> ```
-
-The following versions are available.
-
-1. [Release versions](https://github.com/suzuki-shunsuke/release-js-action/releases)
-
-```yaml
-uses: suzuki-shunsuke/release-js-action@v0.2.0
-```
-
-2. [Pull Request versions](https://github.com/suzuki-shunsuke/release-js-action/branches/all?query=pr%2F&lastTab=overview): These versions are removed when we feel unnecessary. These versions are used to test pull requests.
-
-```yaml
-uses: suzuki-shunsuke/release-js-action@pr/299
-```
-
-3. [latest branch](https://github.com/suzuki-shunsuke/release-js-action/tree/latest): [This branch is built by CI when the main branch is updated](https://github.com/suzuki-shunsuke/release-js-action/blob/latest/.github/workflows/main.yaml). Note that we push commits to the latest branch forcibly.
-
-```yaml
-uses: suzuki-shunsuke/release-js-action@latest
-```
-
-Pull Request versions and the latest branch are unstable.
-These versions are for testing.
-You should use the latest release version in production.
+[Please see the document.](docs/available_versions.md)
