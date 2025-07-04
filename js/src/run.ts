@@ -17,6 +17,8 @@ const Action = z.object({
 });
 type Action = z.infer<typeof Action>;
 
+const waitAfterCommit = () => new Promise(resolve => setTimeout(resolve, 1000));
+
 export const main = async () => {
   const version = core.getInput("version", { required: true });
   const pr = core.getInput("pr");
@@ -56,6 +58,7 @@ export const main = async () => {
       files: distFiles,
     });
     sha = result?.commit.sha || baseRevision;
+    await waitAfterCommit();
   }
 
   sha = await fixActionVersions(
@@ -254,6 +257,7 @@ const fixActionVersions = async (
       files: [...changedFiles],
     });
     sha = result?.commit.sha || sha;
+    await waitAfterCommit();
   }
   return sha;
 };
