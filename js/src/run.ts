@@ -205,9 +205,9 @@ const fixActionVersions = async (
   const actions: ActionFile[] = [];
   for (const file of actionFiles) {
     const action = await readActionFile(repo, file, actionPattern);
+    core.info(`action name=${action.name} path=${action.path} dependencies=${JSON.stringify([...action.dependencies])}`);
     actions.push(action);
   }
-  core.info(`actions: ${JSON.stringify(actions)}`);
   const changedFiles = new Set<string>();
   while (true) {
     changedFiles.clear();
