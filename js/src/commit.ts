@@ -56,10 +56,16 @@ export const createCommit = async (
     repo: opts.repo,
     branch: opts.branch,
   });
-  // Update the reference if the branch exists
-  return await updateRef(octokit, opts, commit.data.sha);
-  // Create a reference if the branch does not exist
-  // return await createRef(octokit, opts, commit.data.sha);
+  try {
+    // Update the reference if the branch exists
+    return await updateRef(octokit, opts, commit.data.sha);
+  } catch (error: any) {
+    if (!error.message.includes("Reference does not exist")) {
+      throw error;
+    }
+    // Create a reference if the branch does not exist
+    return await createRef(octokit, opts, commit.data.sha);
+  }
 };
 
 type FileMode = "100644" | "100755" | "040000" | "160000" | "120000";
