@@ -302,6 +302,7 @@ const getBranch = async (
       ref: input.branch,
     },
   );
+  core.info(`getting a branch ${input.branch}: ${JSON.stringify(resp)}`);
   return resp.repository.ref;
 };
 
