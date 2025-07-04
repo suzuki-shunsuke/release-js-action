@@ -4,7 +4,7 @@ run-name: Release ${{inputs.version}}
 on:
   workflow_dispatch:
     inputs:
-      version:
+      tag:
         description: version
         required: true
       pr:
@@ -17,6 +17,6 @@ jobs:
       contents: write
       pull-requests: write
     with:
-      version: ${{inputs.version}}
+      version: ${{inputs.tag}}
       # https://github.com/orgs/community/discussions/67182
       pr: ${{inputs.pr && fromJSON(inputs.pr) || ''}}
