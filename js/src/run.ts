@@ -250,6 +250,7 @@ const fixActionVersions = async (
       branch,
       message: `chore: prepare release ${version}\nbase revision: ${baseSHA}`,
       baseBranch: branch,
+      baseSHA: sha,
       files: [...changedFiles],
     });
     sha = result?.commit.sha || sha;
