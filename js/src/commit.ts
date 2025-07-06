@@ -3,6 +3,10 @@ import * as core from "@actions/core";
 import type { Octokit } from "@octokit/rest";
 import { readFile, stat } from "fs/promises";
 
+export interface Logger {
+  info(m: string): void;
+}
+
 export type Options = {
   owner: string;
   repo: string;
@@ -17,6 +21,7 @@ export type Options = {
   deletedFiles?: string[]; // files to delete
   deleteIfNotExist?: boolean; // if true, delete files if they don't exist
   forcePush?: boolean; // if true, force push the commit
+  logger?: Logger;
 };
 
 // Created commit, base ref
@@ -37,13 +42,16 @@ export const createCommit = async (
     return undefined;
   }
   validateOptions(opts);
+  const logger = opts.logger || {
+    info: (message: string) => core.info(message),
+  };
   const baseBranch = await getBaseBranch(octokit, opts);
-  const treeSHA = await getTreeSHA(octokit, opts, baseBranch);
+  const treeSHA = await getTreeSHA(octokit, opts, baseBranch, logger);
   // Create a commit
   const parents = opts.noParent
       ? undefined
       : [baseBranch.target.oid];
-  core.info(`creating a commit tree=${treeSHA} parents=${parents}`);
+  logger.info(`creating a commit tree=${treeSHA} parents=${parents}`);
   const commit = await octokit.rest.git.createCommit({
     owner: opts.owner,
     repo: opts.repo,
@@ -53,7 +61,7 @@ export const createCommit = async (
   });
   try {
     // Update the reference if the branch exists
-    return await updateRef(octokit, opts, commit.data.sha);
+    return await updateRef(octokit, opts, commit.data.sha, logger);
   } catch (error: unknown) {
     if (!isError(error)) {
       throw error;
@@ -62,7 +70,7 @@ export const createCommit = async (
       throw error;
     }
     // Create a reference if the branch does not exist
-    return await createRef(octokit, opts, commit.data.sha);
+    return await createRef(octokit, opts, commit.data.sha, logger);
   }
 };
 
@@ -101,9 +109,10 @@ const updateRef = async (
   octokit: GitHub,
   opts: Options,
   sha: string,
+  logger: Logger,
 ): Promise<Result> => {
   // Update the reference if the branch exists
-  core.info(`updating ref=heads/${opts.branch} sha=${sha}`);
+  logger.info(`updating ref=heads/${opts.branch} sha=${sha}`);
   const updatedRef = await octokit.rest.git.updateRef({
     owner: opts.owner,
     repo: opts.repo,
@@ -122,8 +131,9 @@ const createRef = async (
   octokit: GitHub,
   opts: Options,
   sha: string,
+  logger: Logger,
 ): Promise<Result> => {
-  core.info(`creating ref=heads/${opts.branch} sha=${sha}`);
+  logger.info(`creating ref=heads/${opts.branch} sha=${sha}`);
   const createdRef = await octokit.rest.git.createRef({
     owner: opts.owner,
     repo: opts.repo,
@@ -141,6 +151,7 @@ const getTreeSHA = async (
   octokit: GitHub,
   opts: Options,
   baseBranch: Ref,
+  logger: Logger,
 ): Promise<string> => {
   if (opts.empty) {
     return baseBranch.target.tree.oid;
@@ -153,7 +164,7 @@ const getTreeSHA = async (
     tree.push(await createDeletedTreeFile(opts, filePath));
   }
   const baseTree = opts.noParent ? undefined : baseBranch.target.tree.oid;
-  core.info(`creating a tree with ${tree.length} files base_tree=${baseTree}`);
+  logger.info(`creating a tree with ${tree.length} files base_tree=${baseTree}`);
   const treeResp = await octokit.rest.git.createTree({
     owner: opts.owner,
     repo: opts.repo,
