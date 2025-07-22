@@ -117,7 +117,7 @@ jobs:
       - run: npm ci
       - run: npm run build
 
-      - uses: suzuki-shunsuke/release-js-action@964d814f9200bb928f4713098c38218881cfc493 # v0.1.0
+      - uses: suzuki-shunsuke/release-js-action@7586139c29abe68e2bc84395ac4300f20112b764 # v0.1.8
         with:
           version: pr/${{inputs.pr}}
           is_comment: ${{inputs.is_comment}}
@@ -146,7 +146,7 @@ jobs:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
       - run: npm ci
       - run: npm run build
-      - uses: suzuki-shunsuke/release-js-action@964d814f9200bb928f4713098c38218881cfc493 # v0.1.0
+      - uses: suzuki-shunsuke/release-js-action@7586139c29abe68e2bc84395ac4300f20112b764 # v0.1.8
         with:
           version: latest
 ```
@@ -188,7 +188,7 @@ jobs:
       - run: npm ci
       - run: npm run build
 
-      - uses: suzuki-shunsuke/release-js-action@964d814f9200bb928f4713098c38218881cfc493 # v0.1.0
+      - uses: suzuki-shunsuke/release-js-action@7586139c29abe68e2bc84395ac4300f20112b764 # v0.1.8
         with:
           version: ${{inputs.tag}}
           pr: ${{inputs.pr}}
