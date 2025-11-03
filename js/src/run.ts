@@ -3,7 +3,7 @@ import * as fs from "fs/promises";
 import * as core from "@actions/core";
 import * as exec from "@actions/exec";
 import * as github from "@actions/github";
-import * as commit from "./commit";
+import * as commit from "@suzuki-shunsuke/commit-ts";
 import { basename, dirname } from "path";
 import * as yaml from "js-yaml";
 import { z } from "zod";
@@ -57,7 +57,7 @@ export const main = async () => {
         `chore: prepare release ${version}\nbase revision: ${baseRevision}`,
       baseSHA: sha,
       files: distFiles.concat(files).filter(f => f !== ""),
-    });
+    } as commit.Options);
     sha = result?.commit.sha || baseRevision;
     await waitAfterCommit();
   }
