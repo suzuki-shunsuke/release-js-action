@@ -9,7 +9,7 @@
     "@actions/exec": "^1.1.1",
     "@actions/github": "6.0.1",
     "@octokit/rest": "^22.0.0",
-    "glob": "11.0.3",
+    "glob": "11.1.0",
     "js-yaml": "4.1.1",
     "zod": "^4.0.0"
   },
