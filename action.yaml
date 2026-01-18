@@ -48,7 +48,7 @@ runs:
         enable_aqua_install: "false"
         skip_install_aqua: "true"
 
-    - uses: suzuki-shunsuke/release-js-action/js@main
+    - uses: suzuki-shunsuke/release-js-action/js@f0ad2d9d77e6eaafa978e9c46c8e10c25fcd9dfe
       id: js
       with:
         version: ${{inputs.version}}
