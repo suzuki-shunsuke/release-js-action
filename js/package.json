@@ -1,6 +1,6 @@
 {
   "scripts": {
-    "build": "ncc build src/index.ts --license LICENSE",
+    "build": "esbuild src/index.ts --bundle --platform=node --target=node20 --format=cjs --outfile=dist/index.js --legal-comments=external && mv dist/index.js.LEGAL.txt dist/LICENSE",
     "fmt": "prettier --write .",
     "test": "vitest --run"
   },
@@ -17,7 +17,7 @@
     "@types/js-yaml": "4.0.9",
     "@types/node": "24.12.2",
     "@types/tmp": "0.2.6",
-    "@vercel/ncc": "0.38.4",
+    "esbuild": "^0.28.0",
     "ts-node": "10.9.2",
     "typescript": "6.0.3",
     "vitest": "4.1.5"
