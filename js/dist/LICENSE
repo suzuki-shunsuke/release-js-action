@@ -1,0 +1,19 @@
+Bundled license information:
+
+undici/lib/web/fetch/body.js:
+undici/lib/web/fetch/body.js:
+  /*! formdata-polyfill. MIT License. Jimmy Wärting <https://jimmy.warting.se/opensource> */
+
+undici/lib/web/websocket/frame.js:
+undici/lib/web/websocket/frame.js:
+  /*! ws. MIT License. Einar Otto Stangvik <einaros@gmail.com> */
+
+@octokit/request-error/dist-src/index.js:
+  /* v8 ignore else -- @preserve -- Bug with vitest coverage where it sees an else branch that doesn't exist */
+
+@octokit/request/dist-bundle/index.js:
+  /* v8 ignore next -- @preserve */
+  /* v8 ignore else -- @preserve */
+
+js-yaml/dist/js-yaml.mjs:
+  /*! js-yaml 4.1.1 https://github.com/nodeca/js-yaml @license MIT */
