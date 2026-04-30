@@ -28,5 +28,5 @@ outputs:
   branch:
     description: A branch name for a release
 runs:
-  using: "node20"
-  main: "dist/index.js"
+  using: node24
+  main: dist/index.js
