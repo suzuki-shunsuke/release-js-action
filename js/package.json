@@ -17,7 +17,7 @@
     "@types/js-yaml": "4.0.9",
     "@types/node": "24.13.3",
     "@types/tmp": "0.2.6",
-    "esbuild": "0.28.1",
+    "esbuild": "0.28.2",
     "ts-node": "10.9.2",
     "typescript": "7.0.2",
     "vitest": "4.1.10"
