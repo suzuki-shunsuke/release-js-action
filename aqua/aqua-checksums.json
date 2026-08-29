@@ -176,8 +176,18 @@
       "algorithm": "sha256"
     },
     {
-      "id": "registries/github_content/github.com/aquaproj/aqua-registry/v4.546.0/registry.yaml",
-      "checksum": "934EBC672E08D6EB10711D0D805573ED40CD9A36A2FA97BD8374805FA62316E8",
+      "id": "http/unofficial-builds.nodejs.org/download/release/v24.20.0/node-v24.20.0-linux-arm64-musl.tar.gz",
+      "checksum": "2C8C507CCB0F20812D9526BA8CA454B1652AADEF68FC8BAD06F07FB1122DD1EF",
+      "algorithm": "sha256"
+    },
+    {
+      "id": "http/unofficial-builds.nodejs.org/download/release/v24.20.0/node-v24.20.0-linux-x64-musl.tar.gz",
+      "checksum": "9AE1399FEF4BD8990E15773CE1327B336A20B9E97D8C7549F4F42CA73C43F562",
+      "algorithm": "sha256"
+    },
+    {
+      "id": "registries/github_content/github.com/aquaproj/aqua-registry/v4.557.0/registry.yaml",
+      "checksum": "43B82E8B025E6AD42D09C02B194593D0AC8EEDBD47B9982A88C1651CE76A51FA",
       "algorithm": "sha256"
     }
   ]
