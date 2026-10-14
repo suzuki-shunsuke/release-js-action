@@ -108,7 +108,7 @@ jobs:
       contents: write
       pull-requests: write
     steps:
-      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - run: gh pr checkout "$PR"
         if: inputs.pr != ''
         env:
@@ -117,7 +117,7 @@ jobs:
       - run: npm ci
       - run: npm run build
 
-      - uses: suzuki-shunsuke/release-js-action@7586139c29abe68e2bc84395ac4300f20112b764 # v0.1.8
+      - uses: suzuki-shunsuke/release-js-action@ff106e3a3f5b34f174a23db3110031fbf463f15c # v0.2.1
         with:
           version: pr/${{inputs.pr}}
           is_comment: ${{inputs.is_comment}}
@@ -143,10 +143,10 @@ jobs:
     permissions:
       contents: write
     steps:
-      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - run: npm ci
       - run: npm run build
-      - uses: suzuki-shunsuke/release-js-action@7586139c29abe68e2bc84395ac4300f20112b764 # v0.1.8
+      - uses: suzuki-shunsuke/release-js-action@ff106e3a3f5b34f174a23db3110031fbf463f15c # v0.2.1
         with:
           version: latest
 ```
@@ -179,7 +179,7 @@ jobs:
       contents: write
       pull-requests: write
     steps:
-      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - run: gh pr checkout "$PR"
         if: inputs.pr != ''
         env:
@@ -188,7 +188,7 @@ jobs:
       - run: npm ci
       - run: npm run build
 
-      - uses: suzuki-shunsuke/release-js-action@7586139c29abe68e2bc84395ac4300f20112b764 # v0.1.8
+      - uses: suzuki-shunsuke/release-js-action@ff106e3a3f5b34f174a23db3110031fbf463f15c # v0.2.1
         with:
           version: ${{inputs.tag}}
           pr: ${{inputs.pr}}

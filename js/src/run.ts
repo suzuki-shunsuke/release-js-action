@@ -9,15 +9,22 @@ import * as yaml from "js-yaml";
 import { z } from "zod";
 
 const Action = z.object({
-  runs: z.optional(z.object({
-    steps: z.optional(z.array(z.object({
-      uses: z.optional(z.string()),
-    }))),
-  })),
+  runs: z.optional(
+    z.object({
+      steps: z.optional(
+        z.array(
+          z.object({
+            uses: z.optional(z.string()),
+          }),
+        ),
+      ),
+    }),
+  ),
 });
 type Action = z.infer<typeof Action>;
 
-const waitAfterCommit = () => new Promise(resolve => setTimeout(resolve, 1000));
+const waitAfterCommit = () =>
+  new Promise((resolve) => setTimeout(resolve, 1000));
 
 export const main = async () => {
   const version = core.getInput("version", { required: true });
@@ -53,10 +60,9 @@ export const main = async () => {
       owner,
       repo,
       branch,
-      message:
-        `chore: prepare release ${version}\nbase revision: ${baseRevision}`,
+      message: `chore: prepare release ${version}\nbase revision: ${baseRevision}`,
       baseSHA: sha,
-      files: distFiles.concat(files).filter(f => f !== ""),
+      files: distFiles.concat(files).filter((f) => f !== ""),
     });
     sha = result?.commit.sha || baseRevision;
     await waitAfterCommit();
@@ -74,55 +80,60 @@ export const main = async () => {
   core.setOutput("sha", sha);
 
   if (pr && version.startsWith("v")) {
-    await exec.exec("aqua", [
-      "exec",
-      "--",
-      "github-comment",
-      "post",
-      "-var",
-      `repo:${process.env.GITHUB_SERVER_URL}/${owner}/${repo}`,
-      "-pr",
-      pr,
-      "-k",
-      "pre-release",
-      "-var",
-      `tag:${version}`,
-    ], {
-      env: {
-        ...process.env,
-        GITHUB_TOKEN: githubToken,
+    await exec.exec(
+      "aqua",
+      [
+        "exec",
+        "--",
+        "github-comment",
+        "post",
+        "-var",
+        `repo:${process.env.GITHUB_SERVER_URL}/${owner}/${repo}`,
+        "-pr",
+        pr,
+        "-k",
+        "pre-release",
+        "-var",
+        `tag:${version}`,
+      ],
+      {
+        env: {
+          ...process.env,
+          GITHUB_TOKEN: githubToken,
+        },
       },
-    });
+    );
   }
 
   if (version.startsWith("pr/") && isComment) {
     const prNumber = version.substring(3);
-    await exec.exec("aqua", [
-      "exec",
-      "--",
-      "github-comment",
-      "post",
-      "-pr",
-      prNumber,
-      "-k",
-      "create-pr-branch",
-      "-var",
-      `repo:${process.env.GITHUB_SERVER_URL}/${owner}/${repo}`,
-      "-var",
-      `pr:${prNumber}`,
-    ], {
-      env: {
-        ...process.env,
-        GITHUB_TOKEN: githubToken,
+    await exec.exec(
+      "aqua",
+      [
+        "exec",
+        "--",
+        "github-comment",
+        "post",
+        "-pr",
+        prNumber,
+        "-k",
+        "create-pr-branch",
+        "-var",
+        `repo:${process.env.GITHUB_SERVER_URL}/${owner}/${repo}`,
+        "-var",
+        `pr:${prNumber}`,
+      ],
+      {
+        env: {
+          ...process.env,
+          GITHUB_TOKEN: githubToken,
+        },
       },
-    });
+    );
   }
 };
 
-const deleteBranch = async (
-  octokit: commit.GitHub,
-  branch: string,
-) => {
+const deleteBranch = async (octokit: commit.GitHub, branch: string) => {
   const { owner, repo } = github.context.repo;
   const branchExists = await octokit.rest.repos
     .getBranch({
@@ -143,17 +154,17 @@ const deleteBranch = async (
 };
 
 const listActionFiles = async () => {
-  return (await exec.getExecOutput("git", ["ls-files"], {
-    silent: true,
-  }))?.stdout
+  return (
+    await exec.getExecOutput("git", ["ls-files"], {
+      silent: true,
+    })
+  )?.stdout
     .trim()
     .split("\n")
-    .filter(
-      (file: string) => {
-        const base = basename(file);
-        return base === "action.yml" || base === "action.yaml";
-      },
-    );
+    .filter((file: string) => {
+      const base = basename(file);
+      return base === "action.yml" || base === "action.yaml";
+    });
 };
 
 type ActionFile = {
@@ -210,7 +221,9 @@ const fixActionVersions = async (
   const actions: ActionFile[] = [];
   for (const file of actionFiles) {
     const action = await readActionFile(repoFullName, file, actionPattern);
-    core.info(`action name=${action.name} path=${action.path} dependencies=${JSON.stringify([...action.dependencies])}`);
+    core.info(
+      `action name=${action.name} path=${action.path} dependencies=${JSON.stringify([...action.dependencies])}`,
+    );
     actions.push(action);
   }
   while (true) {

@@ -48,9 +48,7 @@ export const createCommit = async (
   const baseBranch = await getBaseBranch(octokit, opts);
   const treeSHA = await getTreeSHA(octokit, opts, baseBranch, logger);
   // Create a commit
-  const parents = opts.noParent
-      ? undefined
-      : [baseBranch.target.oid];
+  const parents = opts.noParent ? undefined : [baseBranch.target.oid];
   logger.info(`creating a commit tree=${treeSHA} parents=${parents}`);
   const commit = await octokit.rest.git.createCommit({
     owner: opts.owner,
@@ -164,7 +162,9 @@ const getTreeSHA = async (
     tree.push(await createDeletedTreeFile(opts, filePath));
   }
   const baseTree = opts.noParent ? undefined : baseBranch.target.tree.oid;
-  logger.info(`creating a tree with ${tree.length} files base_tree=${baseTree}`);
+  logger.info(
+    `creating a tree with ${tree.length} files base_tree=${baseTree}`,
+  );
   const treeResp = await octokit.rest.git.createTree({
     owner: opts.owner,
     repo: opts.repo,
@@ -400,7 +400,7 @@ type getTreeResponse = {
     object: {
       tree: {
         oid: string;
-      }
+      };
     };
   };
 };
