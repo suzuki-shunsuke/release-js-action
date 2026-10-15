@@ -229,10 +229,10 @@ Then they run at the same commit as the calling action, so they always match the
 - uses: $/foo
 ```
 
-#### Migration
+#### Migration to v0.3.0
 
-Previously, this action rewrote `uses: <your repository>[/<path>]@main` in `action.yaml` files to the release commit SHA when releasing.
-This action no longer does it, so released versions would keep referencing `@main`.
+Before v0.3.0, this action rewrote `uses: <your repository>[/<path>]@main` in `action.yaml` files to the release commit SHA when releasing.
+From v0.3.0, this action no longer does it, so released versions would keep referencing `@main`.
 Please replace them with the `$/` syntax.
 
 ```yaml
