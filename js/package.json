@@ -1,7 +1,7 @@
 {
   "scripts": {
     "build": "esbuild src/index.ts --bundle --platform=node --target=node20 --format=cjs --outfile=dist/index.js --legal-comments=external && mv dist/index.js.LEGAL.txt dist/LICENSE",
-    "fmt": "prettier --write .",
+    "fmt": "npm ci --prefix ../.github/prettier --no-audit --no-fund && ../.github/prettier/node_modules/.bin/prettier --write .",
     "test": "vitest --run"
   },
   "dependencies": {

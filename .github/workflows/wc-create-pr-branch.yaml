@@ -20,40 +20,22 @@ on:
       TAKUMI_GUARD_BOT_ID:
         required: true
 jobs:
+  # Install npm packages through Takumi Guard, which requires id-token: write.
+  # The create-pr-branch job runs code of the repository and its dependencies with contents: write,
+  # so it must not have id-token: write.
+  # node_modules is passed to the create-pr-branch job via an artifact.
   jsmodule:
-    timeout-minutes: 15
-    runs-on: ubuntu-26.04
+    uses: suzuki-shunsuke/download-npm-package-action/.github/workflows/download.yaml@ebbf371f6e38b49824a73f8c6680e2e1f83db2e8 # v0.0.1
     permissions:
       contents: read
-      pull-requests: read
-      id-token: write # Required for OIDC
-    outputs:
-      sha: ${{steps.sha.outputs.value}}
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          persist-credentials: false
-      - run: gh pr checkout "$PR"
-        if: inputs.pr != ''
-        env:
-          GITHUB_TOKEN: ${{github.token}}
-          PR: ${{inputs.pr}}
-      - id: sha
-        run: echo "value=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
-      - uses: flatt-security/setup-takumi-guard-npm@14f07d0cbc739b42a1b7c70a04c2b84cd1318ddd # v1.4.0
-        with:
-          bot-id: ${{secrets.TAKUMI_GUARD_BOT_ID}}
-      - run: npm ci
-        working-directory: js
-
-      # Archive node_modules with tar to keep file permissions and symlinks (e.g. node_modules/.bin)
-      - run: tar -cf "$RUNNER_TEMP/node_modules.tar" node_modules
-        working-directory: js
-      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
-        with:
-          path: ${{runner.temp}}/node_modules.tar
-          name: node_modules-create-pr-branch
-          retention-days: 1
+      id-token: write
+    with:
+      # Release the merge commit of the pull request, the same as suzuki-shunsuke/js-action-release-workflow
+      ref: ${{inputs.pr != '' && format('refs/pull/{0}/merge', inputs.pr) || ''}}
+      working_directory: js
+      artifact_name: node_modules-create-pr-branch
+    secrets:
+      TAKUMI_GUARD_BOT_ID: ${{secrets.TAKUMI_GUARD_BOT_ID}}
 
   create-pr-branch:
     timeout-minutes: 20
@@ -63,27 +45,21 @@ jobs:
       contents: write
       pull-requests: write
     steps:
+      # Checkout the commit where npm packages were installed
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
+          ref: ${{needs.jsmodule.outputs.sha}}
           persist-credentials: false
-      - run: gh pr checkout "$PR"
-        if: inputs.pr != ''
-        env:
-          GITHUB_TOKEN: ${{github.token}}
-          PR: ${{inputs.pr}}
-      # Fail if the pull request was updated after node_modules was installed
-      - run: test "$(git rev-parse HEAD)" = "$SHA"
-        env:
-          SHA: ${{needs.jsmodule.outputs.sha}}
       - uses: aquaproj/aqua-installer@82d0e83878a8657c4a6f2ff1755d3bfbfc67f329 # v4.1.0
         with:
           aqua_version: v2.64.0
-      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
-          name: node_modules-create-pr-branch
-          path: ${{runner.temp}}
-      - run: tar -xf "$RUNNER_TEMP/node_modules.tar"
-        working-directory: js
+          node-version-file: .node-version
+      - uses: suzuki-shunsuke/download-npm-package-action/restore@ebbf371f6e38b49824a73f8c6680e2e1f83db2e8 # v0.0.1
+        with:
+          working_directory: js
+          artifact_name: node_modules-create-pr-branch
       - run: npm run build
         working-directory: js
 

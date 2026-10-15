@@ -1,7 +1,7 @@
 # Available versions
 
 This document describes available versions of actions released by release-js-action.
-This document is referred from actions using release-js-action. 
+This document is referred from actions using release-js-action.
 
 Actions released by release-js-action don't work on the default branch and feature branches because built JavaScript files aren't committed to those branches.
 
