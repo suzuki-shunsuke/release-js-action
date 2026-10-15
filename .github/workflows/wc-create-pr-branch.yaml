@@ -30,8 +30,8 @@ jobs:
       contents: read
       id-token: write
     with:
-      # Release the head commit of the pull request instead of the merge commit
-      ref: ${{inputs.pr != '' && format('refs/pull/{0}/head', inputs.pr) || ''}}
+      # Release the merge commit of the pull request, the same as suzuki-shunsuke/js-action-release-workflow
+      ref: ${{inputs.pr != '' && format('refs/pull/{0}/merge', inputs.pr) || ''}}
       working_directory: js
       artifact_name: node_modules-create-pr-branch
     secrets:
