@@ -220,6 +220,28 @@ If you use GitHub Enterprise Server, you need to set the following environment v
     GITHUB_API: https://github.example.com/api/v3/
 ```
 
+### Actions in the same repository
+
+If an action uses other actions in the same repository, reference them with the [`$/` syntax](https://docs.github.com/en/actions/reference/workflows-and-actions/workflow-syntax#example-using-an-action-in-the-same-repository-as-the-workflow-at-the-running-commit-recommended).
+Then they run at the same commit as the calling action, so they always match the released version.
+
+```yaml
+- uses: $/foo
+```
+
+#### Migration to v0.3.0
+
+Before v0.3.0, this action rewrote `uses: <your repository>[/<path>]@main` in `action.yaml` files to the release commit SHA when releasing.
+From v0.3.0, this action no longer does it, so released versions would keep referencing `@main`.
+Please replace them with the `$/` syntax.
+
+```yaml
+# Before
+- uses: owner/repo/foo@main
+# After
+- uses: $/foo
+```
+
 ## Inputs / Outputs
 
 Please see [action.yaml](action.yaml).

@@ -1,27 +1,8 @@
 import { glob } from "glob";
-import * as fs from "fs/promises";
 import * as core from "@actions/core";
 import * as exec from "@actions/exec";
 import * as github from "@actions/github";
 import * as commit from "./commit";
-import { basename, dirname } from "path";
-import * as yaml from "js-yaml";
-import { z } from "zod";
-
-const Action = z.object({
-  runs: z.optional(
-    z.object({
-      steps: z.optional(
-        z.array(
-          z.object({
-            uses: z.optional(z.string()),
-          }),
-        ),
-      ),
-    }),
-  ),
-});
-type Action = z.infer<typeof Action>;
 
 const waitAfterCommit = () =>
   new Promise((resolve) => setTimeout(resolve, 1000));
@@ -68,15 +49,6 @@ export const main = async () => {
     await waitAfterCommit();
   }
 
-  sha = await fixActionVersions(
-    octokit,
-    version,
-    owner,
-    repo,
-    branch,
-    baseRevision,
-    sha,
-  );
   core.setOutput("sha", sha);
 
   if (pr && version.startsWith("v")) {
@@ -151,132 +123,4 @@ const deleteBranch = async (octokit: commit.GitHub, branch: string) => {
       ref: `heads/${branch}`,
     });
   }
-};
-
-const listActionFiles = async () => {
-  return (
-    await exec.getExecOutput("git", ["ls-files"], {
-      silent: true,
-    })
-  )?.stdout
-    .trim()
-    .split("\n")
-    .filter((file: string) => {
-      const base = basename(file);
-      return base === "action.yml" || base === "action.yaml";
-    });
-};
-
-type ActionFile = {
-  content: string;
-  path: string;
-  name: string;
-  dependencies: Set<string>;
-};
-
-const readActionFile = async (
-  repo: string,
-  file: string,
-  pattern: RegExp,
-): Promise<ActionFile> => {
-  const dir = dirname(file);
-  const content = await fs.readFile(file, "utf-8");
-  const action = Action.parse(yaml.load(content));
-  const actions = new Set<string>();
-  for (const step of action.runs?.steps ?? []) {
-    if (!step.uses) {
-      continue;
-    }
-    const found = step.uses.match(pattern);
-    if (found === null) {
-      continue;
-    }
-    actions.add(found[1]);
-  }
-  return {
-    content,
-    path: file,
-    name: dir === "." ? repo : `${repo}/${dir}`,
-    dependencies: actions,
-  };
-};
-
-const fixActionVersions = async (
-  octokit: commit.GitHub,
-  version: string,
-  owner: string,
-  repo: string,
-  branch: string,
-  baseSHA: string,
-  sha: string,
-): Promise<string> => {
-  const actionFiles = await listActionFiles();
-  if (actionFiles.length === 0) {
-    core.info("No action files found, skipping version pinning.");
-    return sha;
-  }
-  const repoFullName = `${owner}/${repo}`;
-
-  const actionPattern = new RegExp(`^(${repoFullName}(?:/.*)?)@main$`);
-  const actions: ActionFile[] = [];
-  for (const file of actionFiles) {
-    const action = await readActionFile(repoFullName, file, actionPattern);
-    core.info(
-      `action name=${action.name} path=${action.path} dependencies=${JSON.stringify([...action.dependencies])}`,
-    );
-    actions.push(action);
-  }
-  while (true) {
-    const changedFiles = new Set<string>();
-    const pinnedActions = new Set<string>();
-    for (const action of actions) {
-      if (action.dependencies.size !== 0) {
-        continue;
-      }
-      pinnedActions.add(action.name);
-      // action does not depend on other actions
-      // So pin the action
-      for (const act of actions) {
-        if (!act.dependencies.has(action.name)) {
-          continue;
-        }
-        // act depends on action
-        // Fix content and remove action from dependencies
-        core.info(`Pinning action ${action.name} to ${sha}`);
-        act.content = act.content.replaceAll(
-          `uses: ${action.name}@main`,
-          `uses: ${action.name}@${sha}`,
-        );
-        changedFiles.add(act.path);
-      }
-    }
-    if (changedFiles.size === 0) {
-      break;
-    }
-    // Fix files
-    for (const act of actions) {
-      if (changedFiles.has(act.path)) {
-        core.info(`Updating action file ${act.path}`);
-        await fs.writeFile(act.path, act.content, "utf-8");
-      }
-    }
-    for (const pinnedAction of pinnedActions) {
-      for (const action of actions) {
-        action.dependencies.delete(pinnedAction);
-      }
-    }
-    // create a commit
-    const result = await commit.createCommit(octokit, {
-      owner,
-      repo,
-      branch,
-      message: `chore: prepare release ${version}\nbase revision: ${baseSHA}`,
-      baseBranch: branch,
-      baseSHA: sha,
-      files: [...changedFiles],
-    });
-    sha = result?.commit.sha || sha;
-    await waitAfterCommit();
-  }
-  return sha;
 };
