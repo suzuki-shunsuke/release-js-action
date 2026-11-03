@@ -20,45 +20,25 @@ on:
       TAKUMI_GUARD_BOT_ID:
         required: true
 jobs:
-  jsmodule:
-    timeout-minutes: 15
-    runs-on: ubuntu-26.04
+  # Install npm packages through Takumi Guard, which requires id-token: write.
+  # The create-pr-branch job must not have id-token: write.
+  npm:
+    uses: suzuki-shunsuke/download-npm-package-action/.github/workflows/download.yaml@cd93d0e45a1804793f6daaf4c24bf55ccf12f494 # v0.0.4
     permissions:
       contents: read
-      pull-requests: read
-      id-token: write # Required for OIDC
-    outputs:
-      sha: ${{steps.sha.outputs.value}}
-    steps:
-      - uses: actions/checkout@v7.0.1
-        with:
-          persist-credentials: false
-      - run: gh pr checkout "$PR"
-        if: inputs.pr != ''
-        env:
-          GITHUB_TOKEN: ${{github.token}}
-          PR: ${{inputs.pr}}
-      - id: sha
-        run: echo "value=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
-      - uses: flatt-security/setup-takumi-guard-npm@v1.4.0
-        with:
-          bot-id: ${{secrets.TAKUMI_GUARD_BOT_ID}}
-      - run: npm ci
-        working-directory: js
-
-      # Archive node_modules with tar to keep file permissions and symlinks (e.g. node_modules/.bin)
-      - run: tar -cf "$RUNNER_TEMP/node_modules.tar" node_modules
-        working-directory: js
-      - uses: actions/upload-artifact@v7.0.2
-        with:
-          path: ${{runner.temp}}/node_modules.tar
-          name: node_modules-create-pr-branch
-          retention-days: 1
+      id-token: write
+    with:
+      # The head commit of the pull request, which the create-pr-branch job checks out by gh pr checkout
+      ref: ${{inputs.pr != '' && format('refs/pull/{0}/head', inputs.pr) || ''}}
+      working_directory: js
+      artifact_name: node_modules-create-pr-branch
+    secrets:
+      TAKUMI_GUARD_BOT_ID: ${{secrets.TAKUMI_GUARD_BOT_ID}}
 
   create-pr-branch:
     timeout-minutes: 20
     runs-on: ubuntu-26.04
-    needs: jsmodule
+    needs: npm
     permissions:
       contents: write
       pull-requests: write
@@ -74,16 +54,17 @@ jobs:
       # Fail if the pull request was updated after node_modules was installed
       - run: test "$(git rev-parse HEAD)" = "$SHA"
         env:
-          SHA: ${{needs.jsmodule.outputs.sha}}
+          SHA: ${{needs.npm.outputs.sha}}
       - uses: aquaproj/aqua-installer@v4.1.1
         with:
           aqua_version: v2.66.0
-      - uses: actions/download-artifact@v8.0.2
+      - uses: actions/setup-node@v7.1.0
         with:
-          name: node_modules-create-pr-branch
-          path: ${{runner.temp}}
-      - run: tar -xf "$RUNNER_TEMP/node_modules.tar"
-        working-directory: js
+          node-version-file: .node-version
+      - uses: suzuki-shunsuke/download-npm-package-action/restore@v0.0.4
+        with:
+          working_directory: js
+          artifact_name: node_modules-create-pr-branch
       - run: npm run build
         working-directory: js
 
