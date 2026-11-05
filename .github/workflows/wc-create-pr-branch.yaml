@@ -57,7 +57,7 @@ jobs:
           SHA: ${{needs.npm.outputs.sha}}
       - uses: aquaproj/aqua-installer@v4.1.1
         with:
-          aqua_version: v2.66.0
+          aqua_version: v2.66.1
       - uses: actions/setup-node@v7.1.0
         with:
           node-version-file: .node-version
